@@ -107,6 +107,21 @@
             </div>
         </div>
 
+        <!-- Global Modal for Deleting Category -->
+        <div id="delete-modal" class="hidden absolute inset-0 z-50 items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <div class="glass-card w-full max-w-sm p-6 sm:p-8 rounded-[2rem] text-center shadow-2xl border border-red-500/50">
+                <div class="bg-red-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+                    <i data-lucide="trash-2" class="text-red-400 w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-black text-white mb-2 leading-tight">Delete Category?</h3>
+                <p class="text-sm text-slate-300 mb-8 px-2">This action cannot be undone. Are you completely sure?</p>
+                <div class="flex space-x-3">
+                    <button onclick="closeDeleteModal()" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">Cancel</button>
+                    <button onclick="confirmDeleteCategory()" class="flex-1 py-3.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all">Delete</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Global Modal for Series Winner -->
         <div id="winner-modal" class="hidden absolute inset-0 z-50 items-center justify-center p-4 bg-black/80 backdrop-blur-md">
             <div class="glass-card w-full max-w-sm p-6 sm:p-8 rounded-[2rem] text-center shadow-2xl border border-amber-500/50">
@@ -191,7 +206,7 @@
             ],
             imposterCount: 1,
             customCategories: [],
-            customForm: { name: '', wordsText: '', error: '' },
+            customForm: { id: null, name: '', wordsText: '', error: '' },
             settings: {
                 blindImposter: false,
                 clueRounds: 2,
@@ -216,12 +231,36 @@
                 currentPunishment: '',
                 punishedPlayer: null,
                 lastVotedId: null,
-                earnings: {} // Tracks who earned what this round
+                earnings: {} 
             },
             pendingVoteId: null
         };
 
         let timerInterval = null;
+
+        // --- Local Storage Management ---
+        const LOCAL_STORAGE_KEY = 'imposterGame_customCategories';
+
+        function loadCategoriesFromStorage() {
+            const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    // Ensure older categories without IDs get one
+                    state.customCategories = parsed.map(cat => ({
+                        ...cat,
+                        id: cat.id || Date.now() + Math.random()
+                    }));
+                } catch(e) {
+                    console.error("Failed to load custom categories", e);
+                    state.customCategories = [];
+                }
+            }
+        }
+
+        function saveCategoriesToStorage() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state.customCategories));
+        }
 
         // --- Utilities ---
         const shuffle = (arr) => {
@@ -526,11 +565,16 @@
 
             return `
                 <button onclick="startGame('${cat.name}')" class="relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl aspect-[4/3] text-left transition-all active:scale-95 overflow-hidden group ${bgClass}">
-                    <div class="flex justify-between items-start relative z-10 w-full">
-                        <h3 class="text-white font-bold text-base sm:text-lg leading-tight w-[70%] break-words">${cat.name}</h3>
+                    <div class="flex justify-between items-start relative z-10 w-full pr-6">
+                        <h3 class="text-white font-bold text-base sm:text-lg leading-tight w-full break-words">${cat.name}</h3>
                         ${isPro ? `
-                            <div class="bg-amber-500/20 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center space-x-1 border border-amber-500/50">
+                            <div class="absolute top-0 right-0 bg-amber-500/20 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center space-x-1 border border-amber-500/50">
                                 <i data-lucide="sparkles" class="w-3 h-3"></i><span>PRO</span>
+                            </div>
+                        ` : ''}
+                        ${isCustom ? `
+                            <div onclick="editCustomCategory(${cat.id}, event)" class="absolute -top-1 -right-1 p-2 bg-fuchsia-500/20 text-fuchsia-300 hover:text-white hover:bg-fuchsia-500/60 rounded-full transition-all z-20 hover:scale-110">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
                             </div>
                         ` : ''}
                     </div>
@@ -567,7 +611,7 @@
                         <h2 class="text-fuchsia-400/80 font-bold uppercase tracking-widest text-xs mb-3 px-1">Your Categories</h2>
                         <div class="grid grid-cols-2 gap-3 sm:gap-4">
                             ${state.customCategories.map(renderCategoryItem).join('')}
-                            <button onclick="setScreen('createCustom')" class="relative flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl aspect-[4/3] transition-all active:scale-95 glass-card border-dashed border-2 border-slate-600 hover:border-blue-400 hover:bg-blue-500/5 group">
+                            <button onclick="openCreateCustom()" class="relative flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl aspect-[4/3] transition-all active:scale-95 glass-card border-dashed border-2 border-slate-600 hover:border-blue-400 hover:bg-blue-500/5 group">
                                 <div class="bg-slate-800 group-hover:bg-blue-500/20 p-2 sm:p-3 rounded-full mb-2 transition-colors">
                                     <i data-lucide="plus" class="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
                                 </div>
@@ -580,8 +624,11 @@
         }
 
         function renderCreateCustom() {
+            const isEditing = !!state.customForm.id;
+            const title = isEditing ? 'Edit Category' : 'New Category';
+            
             return `
-                ${topBar('New Category', true, 'goToCategories')}
+                ${topBar(title, true, 'goToCategories')}
                 <div class="flex-1 overflow-y-auto pb-4 custom-scrollbar">
                     <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-6">
                         ${state.customForm.error ? `
@@ -604,11 +651,17 @@
                     </div>
                 </div>
                 
-                <div class="shrink-0 mt-2">
+                <div class="shrink-0 mt-2 space-y-3">
                     <button onclick="saveCustomCategory()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center space-x-2 transition-all">
                         <i data-lucide="check" class="w-5 h-5"></i>
                         <span>Save Category</span>
                     </button>
+                    ${isEditing ? `
+                        <button onclick="openDeleteModal()" class="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 active:scale-95 text-red-400 border border-red-500/30 rounded-2xl font-bold text-base transition-all flex items-center justify-center space-x-2">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            <span>Delete Category</span>
+                        </button>
+                    ` : ''}
                 </div>
             `;
         }
@@ -849,7 +902,6 @@
                 `;
             }
 
-            // Build the detailed earnings list and explicitly order by highest points gained
             const sortedPlayers = [...state.players].sort((a,b) => (state.game.earnings[b.id] || 0) - (state.game.earnings[a.id] || 0));
             
             const earningsHTML = sortedPlayers.map(p => {
@@ -1007,6 +1059,27 @@
             render();
         }
 
+        // --- Custom Category Management ---
+
+        function openCreateCustom() {
+            state.customForm = { id: null, name: '', wordsText: '', error: '' };
+            setScreen('createCustom');
+        }
+
+        function editCustomCategory(id, event) {
+            event.stopPropagation(); // Prevents starting the game
+            const cat = state.customCategories.find(c => c.id === id);
+            if (cat) {
+                state.customForm = {
+                    id: cat.id,
+                    name: cat.name,
+                    wordsText: cat.wordList.join(', '),
+                    error: ''
+                };
+                setScreen('createCustom');
+            }
+        }
+
         function updateCustomForm(field, value) {
             state.customForm[field] = value;
             state.customForm.error = '';
@@ -1016,19 +1089,67 @@
             const name = state.customForm.name.trim();
             if (!name) { state.customForm.error = 'Category name cannot be empty.'; return render(); }
             
-            if (INITIAL_CATEGORIES.some(c => c.name.toLowerCase() === name.toLowerCase()) || 
-                state.customCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+            // Check for duplicate names, ignoring the currently edited one
+            const isDupStandard = INITIAL_CATEGORIES.some(c => c.name.toLowerCase() === name.toLowerCase());
+            const isDupCustom = state.customCategories.some(c => c.name.toLowerCase() === name.toLowerCase() && c.id !== state.customForm.id);
+            
+            if (isDupStandard || isDupCustom) {
                 state.customForm.error = 'A category with this name already exists.'; return render();
             }
             
             const words = state.customForm.wordsText.split(/[,;\n]+/).map(w => w.trim()).filter(w => w.length > 0);
             if (words.length < 3) { state.customForm.error = 'Please enter at least 3 valid words separated by commas.'; return render(); }
 
-            state.customCategories.push({ name, words: words.length, type: 'custom', wordList: words });
-            state.customForm = { name: '', wordsText: '', error: '' };
+            if (state.customForm.id) {
+                // Update existing
+                const index = state.customCategories.findIndex(c => c.id === state.customForm.id);
+                if (index !== -1) {
+                    state.customCategories[index] = { 
+                        id: state.customForm.id, 
+                        name, 
+                        words: words.length, 
+                        type: 'custom', 
+                        wordList: words 
+                    };
+                }
+            } else {
+                // Create new
+                state.customCategories.push({ 
+                    id: Date.now(), 
+                    name, 
+                    words: words.length, 
+                    type: 'custom', 
+                    wordList: words 
+                });
+            }
+
+            saveCategoriesToStorage();
+            state.customForm = { id: null, name: '', wordsText: '', error: '' };
             setScreen('categories');
         }
 
+        function openDeleteModal() {
+            getEl('delete-modal').classList.remove('hidden');
+            getEl('delete-modal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            getEl('delete-modal').classList.add('hidden');
+            getEl('delete-modal').classList.remove('flex');
+        }
+
+        function confirmDeleteCategory() {
+            if (state.customForm.id) {
+                state.customCategories = state.customCategories.filter(c => c.id !== state.customForm.id);
+                saveCategoriesToStorage();
+                
+                closeDeleteModal();
+                state.customForm = { id: null, name: '', wordsText: '', error: '' };
+                setScreen('categories');
+            }
+        }
+
+        // --- Game Flow ---
         function startGame(categoryName) {
             let words = WORD_DATABASE[categoryName];
             if (!words) {
@@ -1280,11 +1401,15 @@
 
         // --- Init ---
         window.onload = () => {
+            loadCategoriesFromStorage();
             render();
         };
     </script>
 </body>
 </html>
+
+
+
 
 
 
