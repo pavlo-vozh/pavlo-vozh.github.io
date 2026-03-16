@@ -51,7 +51,7 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.2);
+            background: rgba(148, 163, 184, 0.3);
             border-radius: 4px;
         }
 
@@ -88,7 +88,7 @@
         
         <div class="bg-gradient-overlay"></div>
 
-        <div id="app-root" class="relative z-10 flex-1 flex flex-col px-5 sm:px-6 h-full overflow-hidden">
+        <div id="app-root" class="relative z-10 flex-1 flex flex-col px-5 sm:px-6 h-full overflow-hidden pb-4 sm:pb-6">
             <!-- Content injected here -->
         </div>
 
@@ -125,23 +125,24 @@
     </div>
 
     <script>
-        // --- Database ---
+        // --- Database (Updated 32+ words per category) ---
         const WORD_DATABASE = {
-            'Animals': ['Lion', 'Elephant', 'Giraffe', 'Penguin', 'Kangaroo', 'Dolphin', 'Tiger', 'Bear', 'Wolf', 'Eagle', 'Shark', 'Monkey', 'Zebra', 'Rhino', 'Hippo', 'Crocodile', 'Snake', 'Frog', 'Cheetah', 'Panther', 'Gorilla', 'Sloth', 'Bat', 'Owl', 'Koala', 'Panda'],
-            'Food': ['Pizza', 'Sushi', 'Taco', 'Hamburger', 'Pasta', 'Ice Cream', 'Pancake', 'Salad', 'Steak', 'Waffle', 'Burrito', 'Sandwich', 'Hot Dog', 'Fries', 'Soup', 'Curry', 'Ramen', 'Dumplings', 'Noodles', 'Bread', 'Cheese', 'Bacon', 'Eggs', 'Chicken'],
-            'Objects': ['Smartphone', 'Laptop', 'Chair', 'Bicycle', 'Camera', 'Television', 'Watch', 'Headphones', 'Backpack', 'Shoes', 'Guitar', 'Glasses', 'Table', 'Bed', 'Sofa', 'Lamp', 'Clock', 'Mirror', 'Book', 'Wallet', 'Umbrella', 'Scissors', 'Knife'],
-            'Locations': ['Beach', 'Mountain', 'Forest', 'Desert', 'City', 'Island', 'Jungle', 'Cave', 'Space Station', 'Castle', 'Hospital', 'School', 'Library', 'Museum', 'Park', 'Zoo', 'Aquarium', 'Theme Park', 'Cinema', 'Restaurant', 'Airport', 'Hotel'],
-            'NFL QBs (25-26)': ['Patrick Mahomes', 'Josh Allen', 'Lamar Jackson', 'Joe Burrow', 'C.J. Stroud', 'Justin Herbert', 'Jalen Hurts', 'Brock Purdy', 'Dak Prescott', 'Jordan Love', 'Jared Goff', 'Matthew Stafford', 'Tua Tagovailoa', 'Trevor Lawrence', 'Aaron Rodgers', 'Kirk Cousins', 'Kyler Murray', 'Baker Mayfield', 'Jayden Daniels', 'Caleb Williams', 'Drake Maye', 'Bo Nix', 'Anthony Richardson', 'Will Levis', 'Bryce Young', 'Deshaun Watson', 'Geno Smith', 'Derek Carr', 'Sam Darnold', 'Russell Wilson', 'Daniel Jones'],
+            'Sports': ['Soccer', 'Basketball', 'Baseball', 'Tennis', 'Golf', 'Rugby', 'Cricket', 'Volleyball', 'Table Tennis', 'Badminton', 'Swimming', 'Boxing', 'MMA', 'Wrestling', 'Hockey', 'Ice Hockey', 'Field Hockey', 'Gymnastics', 'Athletics', 'Track and Field', 'Cycling', 'Surfing', 'Snowboarding', 'Skiing', 'Skateboarding', 'Bowling', 'Archery', 'Fencing', 'Rowing', 'Sailing', 'Weightlifting', 'Martial Arts', 'Judo', 'Karate', 'Taekwondo', 'Water Polo', 'Handball', 'Lacrosse', 'Softball', 'Dodgeball'],
+            'Animals': ['Lion', 'Elephant', 'Giraffe', 'Penguin', 'Kangaroo', 'Dolphin', 'Tiger', 'Bear', 'Wolf', 'Eagle', 'Shark', 'Monkey', 'Zebra', 'Rhino', 'Hippo', 'Crocodile', 'Snake', 'Frog', 'Cheetah', 'Panther', 'Gorilla', 'Sloth', 'Bat', 'Owl', 'Koala', 'Panda', 'Camel', 'Fox', 'Deer', 'Moose', 'Rabbit', 'Squirrel', 'Horse', 'Cow', 'Pig', 'Sheep', 'Goat', 'Duck', 'Chicken', 'Turkey'],
+            'Food': ['Pizza', 'Sushi', 'Taco', 'Hamburger', 'Pasta', 'Ice Cream', 'Pancake', 'Salad', 'Steak', 'Waffle', 'Burrito', 'Sandwich', 'Hot Dog', 'Fries', 'Soup', 'Curry', 'Ramen', 'Dumplings', 'Noodles', 'Bread', 'Cheese', 'Bacon', 'Eggs', 'Chicken', 'Apple', 'Banana', 'Orange', 'Grapes', 'Strawberry', 'Chocolate', 'Cake', 'Cookie', 'Pie', 'Donut', 'Muffin', 'Croissant', 'Toast', 'Cereal', 'Oatmeal', 'Yogurt', 'Butter'],
+            'Objects': ['Smartphone', 'Laptop', 'Chair', 'Bicycle', 'Camera', 'Television', 'Watch', 'Headphones', 'Backpack', 'Shoes', 'Guitar', 'Glasses', 'Table', 'Bed', 'Sofa', 'Lamp', 'Clock', 'Mirror', 'Book', 'Wallet', 'Umbrella', 'Scissors', 'Knife', 'Pencil', 'Pen', 'Eraser', 'Notebook', 'Stapler', 'Tape', 'Glue', 'Ruler', 'Calculator', 'Lunchbox', 'Water Bottle', 'Keys', 'Purse', 'Sunglasses', 'Hat', 'Scarf', 'Gloves'],
+            'Locations': ['Beach', 'Mountain', 'Forest', 'Desert', 'City', 'Island', 'Jungle', 'Cave', 'Space Station', 'Castle', 'Hospital', 'School', 'Library', 'Museum', 'Park', 'Zoo', 'Aquarium', 'Theme Park', 'Cinema', 'Restaurant', 'Airport', 'Hotel', 'Bank', 'Post Office', 'Police Station', 'Fire Station', 'Supermarket', 'Bakery', 'Pharmacy', 'Gym', 'Stadium', 'Theater', 'Bowling Alley', 'Skating Rink', 'Arcade', 'Art Gallery', 'Church', 'Temple', 'Mosque', 'Synagogue'],
+            'NFL QBs': ['Patrick Mahomes', 'Josh Allen', 'Lamar Jackson', 'Joe Burrow', 'C.J. Stroud', 'Justin Herbert', 'Jalen Hurts', 'Brock Purdy', 'Dak Prescott', 'Jordan Love', 'Jared Goff', 'Matthew Stafford', 'Tua Tagovailoa', 'Trevor Lawrence', 'Aaron Rodgers', 'Kirk Cousins', 'Kyler Murray', 'Baker Mayfield', 'Jayden Daniels', 'Caleb Williams', 'Drake Maye', 'Bo Nix', 'Anthony Richardson', 'Will Levis', 'Bryce Young', 'Deshaun Watson', 'Geno Smith', 'Derek Carr', 'Sam Darnold', 'Russell Wilson', 'Daniel Jones', 'Gardner Minshew', 'Justin Fields'],
             'Clash Royale': ['Knight', 'Archers', 'Goblins', 'Giant', 'PEKKA', 'Minions', 'Balloon', 'Witch', 'Barbarians', 'Golem', 'Skeletons', 'Valkyrie', 'Hog Rider', 'Bomber', 'Musketeer', 'Baby Dragon', 'Prince', 'Wizard', 'Mini PEKKA', 'Skeleton Army', 'X-Bow', 'Inferno Tower', 'Rocket', 'Goblin Barrel', 'Freeze', 'Mirror', 'Lightning', 'The Log', 'Miner', 'Princess', 'Ice Wizard', 'Lumberjack', 'Lava Hound', 'Sparky', 'Mega Knight', 'Electro Wizard', 'Bandit'],
-            'Games': ['Minecraft', 'Monopoly', 'Chess', 'Poker', 'Tetris', 'Fortnite', 'Scrabble', 'Mario Kart', 'Zelda', 'Roblox', 'Checkers', 'Catan', 'Uno', 'Cards Against Humanity', 'Charades', 'Twister', 'Hide and Seek', 'Pac-Man'],
-            'Anime': ['Naruto', 'Dragon Ball', 'One Piece', 'Attack on Titan', 'Death Note', 'My Hero Academia', 'Demon Slayer', 'Bleach', 'Evangelion', 'Pokemon', 'Fullmetal Alchemist', 'Hunter x Hunter', 'Cowboy Bebop', 'Spirited Away', 'Jujutsu Kaisen', 'Chainsaw Man', 'Spy x Family', 'JoJos Bizarre Adventure'],
-            'Superpowers': ['Flight', 'Invisibility', 'Telepathy', 'Strength', 'Time Travel', 'Telekinesis', 'Speed', 'Healing', 'Shapeshifting', 'X-Ray', 'Teleportation', 'Mind Control', 'Force Fields', 'Fire Manipulation', 'Water Manipulation', 'Immortality', 'Invulnerability']
+            'Games': ['Minecraft', 'Monopoly', 'Chess', 'Poker', 'Tetris', 'Fortnite', 'Scrabble', 'Mario Kart', 'Zelda', 'Roblox', 'Checkers', 'Catan', 'Uno', 'Cards Against Humanity', 'Charades', 'Twister', 'Hide and Seek', 'Pac-Man', 'Call of Duty', 'Overwatch', 'Valorant', 'League of Legends', 'Dota 2', 'CS:GO', 'Apex Legends', 'Rocket League', 'Among Us', 'Fall Guys', 'Genshin Impact', 'Elden Ring', 'Skyrim', 'The Witcher 3', 'Red Dead Redemption 2', 'GTA V', 'Super Smash Bros', 'Animal Crossing'],
+            'Anime': ['Naruto', 'Dragon Ball', 'One Piece', 'Attack on Titan', 'Death Note', 'My Hero Academia', 'Demon Slayer', 'Bleach', 'Evangelion', 'Pokemon', 'Fullmetal Alchemist', 'Hunter x Hunter', 'Cowboy Bebop', 'Spirited Away', 'Jujutsu Kaisen', 'Chainsaw Man', 'Spy x Family', 'JoJos Bizarre Adventure', 'Tokyo Ghoul', 'Sword Art Online', 'Fairy Tail', 'Black Clover', 'Haikyuu', 'Kuroko no Basket', 'Sailor Moon', 'Cardcaptor Sakura', 'Inuyasha', 'Yu Yu Hakusho', 'Rurouni Kenshin', 'Gintama', 'Mob Psycho 100', 'One Punch Man', 'Dr. Stone', 'Promised Neverland'],
+            'Superpowers': ['Flight', 'Invisibility', 'Telepathy', 'Strength', 'Time Travel', 'Telekinesis', 'Speed', 'Healing', 'Shapeshifting', 'X-Ray', 'Teleportation', 'Mind Control', 'Force Fields', 'Fire Manipulation', 'Water Manipulation', 'Immortality', 'Invulnerability', 'Super Hearing', 'Super Vision', 'Elasticity', 'Intangibility', 'Gravity Manipulation', 'Weather Control', 'Lightning Manipulation', 'Earth Manipulation', 'Ice Manipulation', 'Sonic Scream', 'Animal Control', 'Plant Manipulation', 'Illusion Creation', 'Precognition', 'Technopathy', 'Size Alteration', 'Duplication', 'Energy Blasts']
         };
 
         const INITIAL_CATEGORIES = Object.keys(WORD_DATABASE).map(name => ({
             name,
             words: WORD_DATABASE[name].length,
-            type: ['NFL QBs (25-26)', 'Clash Royale', 'Anime', 'Superpowers'].includes(name) ? 'pro' : 'free'
+            type: ['NFL QBs', 'Clash Royale', 'Anime', 'Superpowers'].includes(name) ? 'pro' : 'free'
         }));
 
         const PUNISHMENTS = [
@@ -168,7 +169,7 @@
             customForm: { name: '', wordsText: '', error: '' },
             settings: {
                 blindImposter: false,
-                clueRounds: 1,
+                clueRounds: 2, // Changed default to 2
                 timeLimit: 0,
                 scoreLimit: 3, // Play to 3 points
                 punishments: true
@@ -179,7 +180,7 @@
                 imposterIds: [],
                 currentPlayerIndex: 0,
                 roleRevealed: false,
-                winner: null, // 'players' or 'imposter'
+                winner: null, 
                 shuffledPlayers: [],
                 activeTurnIndex: 0,
                 timeLeft: 0,
@@ -225,13 +226,13 @@
 
         function topBar(title, showBack = true, backAction = 'goToHome') {
             return `
-                <div class="flex items-center mb-6 pt-6 relative z-10 shrink-0">
+                <div class="flex items-center mb-4 sm:mb-6 pt-6 relative z-10 shrink-0">
                     ${showBack ? `
                         <button onclick="${backAction}()" class="p-2 -ml-2 text-slate-300 hover:text-white transition-colors bg-white/5 rounded-full backdrop-blur-sm mr-3">
                             <i data-lucide="chevron-left" class="w-6 h-6"></i>
                         </button>
                     ` : ''}
-                    <h1 class="text-2xl font-bold text-white tracking-wide">${title}</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-white tracking-wide">${title}</h1>
                 </div>
             `;
         }
@@ -239,8 +240,8 @@
         // --- Screen Templates ---
         function renderHome() {
             return `
-                <div class="flex flex-col items-center justify-center h-full space-y-12 relative z-10">
-                    <div class="text-center space-y-6">
+                <div class="flex-1 overflow-y-auto flex flex-col items-center justify-center relative z-10 pb-6">
+                    <div class="text-center space-y-6 mt-12 mb-auto">
                         <div class="relative inline-block group">
                             <div class="absolute inset-0 bg-blue-500 blur-[40px] opacity-30 rounded-full"></div>
                             <div class="relative bg-gradient-to-b from-slate-800 to-slate-900 p-6 rounded-3xl border border-slate-700 shadow-2xl">
@@ -253,7 +254,7 @@
                         </div>
                     </div>
 
-                    <div class="w-full max-w-[280px] sm:max-w-xs space-y-4">
+                    <div class="w-full max-w-[280px] sm:max-w-xs space-y-4 shrink-0 mt-8">
                         <button onclick="setScreen('setup')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex items-center justify-center space-x-2">
                             <i data-lucide="play" class="w-6 h-6 fill-current"></i>
                             <span>Play Now</span>
@@ -276,7 +277,7 @@
 
             return `
                 ${topBar('How to Play', true, 'goToHome')}
-                <div class="flex-1 overflow-y-auto space-y-4 pb-12 pr-1 custom-scrollbar">
+                <div class="flex-1 overflow-y-auto space-y-4 pb-4 pr-1 custom-scrollbar">
                     ${steps.map(step => `
                         <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-start space-x-4">
                             <div class="bg-blue-500/10 p-3 rounded-full flex-shrink-0 mt-1 shadow-[0_0_10px_rgba(59,130,246,0.1)] border border-blue-500/20">
@@ -299,148 +300,157 @@
             return `
                 ${topBar('Setup Game', true, 'goToHome')}
                 
-                <!-- Player List -->
-                <div class="glass-card rounded-3xl p-4 sm:p-5 mb-4 flex-1 overflow-hidden flex flex-col shrink-0 min-h-[35%]">
-                    <div class="flex justify-between items-center mb-4 shrink-0">
-                        <span class="text-white font-semibold flex items-center text-base sm:text-lg">
-                            <i data-lucide="users" class="w-5 h-5 mr-2 text-blue-400"></i> ${state.players.length} Players
-                        </span>
-                        ${state.players.length < 12 ? `
-                            <button onclick="addPlayer()" class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-white px-3 py-1.5 rounded-full flex items-center text-sm font-semibold transition-colors">
-                                <i data-lucide="user-plus" class="w-4 h-4 mr-1"></i> Add
-                            </button>
-                        ` : ''}
-                    </div>
+                <!-- Main Scrollable Content Area -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 flex flex-col space-y-4">
                     
-                    <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1 pb-2">
-                        ${state.players.map((player, index) => `
-                            <div class="flex items-center space-x-3 group">
-                                <div class="bg-slate-800/80 border border-slate-700 text-blue-400 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-inner">
-                                    ${index + 1}
-                                </div>
-                                <input type="text" value="${player.name}" oninput="updatePlayerName(${player.id}, this.value)" 
-                                    class="flex-1 bg-black/20 border border-slate-700/50 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all"
-                                    placeholder="Player ${index + 1}">
-                                
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-xs font-bold text-slate-500 w-12 text-center bg-black/30 py-1 rounded-md">
-                                        ${player.score} pts
-                                    </span>
-                                    ${state.players.length > 3 ? `
-                                        <button onclick="removePlayer(${player.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all">
-                                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="overflow-y-auto custom-scrollbar flex-shrink-0 max-h-[45%] mb-6 pr-1">
-                    
-                    <!-- Imposters Setup -->
-                    <div class="glass-card rounded-2xl p-4 mb-3 flex justify-between items-center border-blue-500/20">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="alert-circle" class="w-5 h-5 text-red-400"></i>
-                            <span class="text-white font-semibold">Imposters</span>
-                        </div>
-                        <div class="flex items-center space-x-4 bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                            <button onclick="updateImposterCount(-1)" ${state.imposterCount <= 1 ? 'disabled' : ''} class="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors">
-                                <i data-lucide="minus" class="w-4 h-4"></i>
-                            </button>
-                            <span class="text-white font-bold w-4 text-center">${state.imposterCount}</span>
-                            <button onclick="updateImposterCount(1)" ${state.imposterCount >= maxImposters ? 'disabled' : ''} class="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors">
-                                <i data-lucide="plus" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Score Limit Setting -->
-                    <div class="glass-card rounded-2xl p-4 mb-3 flex justify-between items-center border-amber-500/20">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
-                            <span class="text-white font-semibold">Play To (Wins)</span>
-                        </div>
-                        <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                            ${[1, 3, 5].map(num => `
-                                <button onclick="updateSetting('scoreLimit', ${num})" class="w-10 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.scoreLimit === num ? 'bg-amber-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
-                                    ${num}
+                    <!-- Player List -->
+                    <div class="glass-card rounded-3xl p-4 sm:p-5 flex flex-col shrink-0 min-h-[220px] max-h-[350px]">
+                        <div class="flex justify-between items-center mb-4 shrink-0">
+                            <span class="text-white font-semibold flex items-center text-base sm:text-lg">
+                                <i data-lucide="users" class="w-5 h-5 mr-2 text-blue-400"></i> ${state.players.length} Players
+                            </span>
+                            ${state.players.length < 12 ? `
+                                <button onclick="addPlayer()" class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-white px-3 py-1.5 rounded-full flex items-center text-sm font-semibold transition-colors">
+                                    <i data-lucide="user-plus" class="w-4 h-4 mr-1"></i> Add
                                 </button>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1 pb-2">
+                            ${state.players.map((player, index) => `
+                                <div class="flex items-center space-x-3 group">
+                                    <div class="bg-slate-800/80 border border-slate-700 text-blue-400 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-inner">
+                                        ${index + 1}
+                                    </div>
+                                    <input type="text" value="${player.name}" oninput="updatePlayerName(${player.id}, this.value)" 
+                                        class="flex-1 bg-black/20 border border-slate-700/50 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all"
+                                        placeholder="Player ${index + 1}">
+                                    
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-xs font-bold text-slate-500 w-12 text-center bg-black/30 py-1 rounded-md">
+                                            ${player.score} pts
+                                        </span>
+                                        ${state.players.length > 3 ? `
+                                            <button onclick="removePlayer(${player.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all shrink-0">
+                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
                             `).join('')}
                         </div>
                     </div>
 
-                    <!-- Advanced Settings -->
-                    <div class="glass-card rounded-2xl p-4 space-y-5 border-blue-500/20 mb-2">
-                        <div class="flex items-center space-x-2 border-b border-slate-700/50 pb-2">
-                            <i data-lucide="settings-2" class="w-4 h-4 text-purple-400"></i>
-                            <span class="text-white font-semibold text-sm uppercase tracking-wide">Advanced Settings</span>
-                        </div>
-                        
-                        <!-- Blind Mode -->
-                        <div class="flex items-center justify-between group">
+                    <!-- Settings Block -->
+                    <div class="space-y-3 shrink-0">
+                        <!-- Imposters Setup -->
+                        <div class="glass-card rounded-2xl p-4 flex justify-between items-center border-blue-500/20">
                             <div class="flex items-center space-x-2">
-                                <i data-lucide="eye-off" class="w-4 h-4 ${state.settings.blindImposter ? 'text-purple-400' : 'text-slate-500'}"></i>
-                                <div>
-                                    <span class="text-slate-200 text-sm font-medium block">Blind Imposter</span>
-                                    <span class="text-slate-500 text-[10px] block">Hide category from Imposter</span>
-                                </div>
+                                <i data-lucide="alert-circle" class="w-5 h-5 text-red-400"></i>
+                                <span class="text-white font-semibold">Imposters</span>
                             </div>
-                            <button onclick="toggleSetting('blindImposter')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 ${state.settings.blindImposter ? 'bg-purple-600' : 'bg-slate-700'}">
-                                <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.blindImposter ? 'translate-x-6' : 'translate-x-0'}"></div>
-                            </button>
+                            <div class="flex items-center space-x-4 bg-black/30 rounded-xl p-1 border border-slate-700/50">
+                                <button onclick="updateImposterCount(-1)" ${state.imposterCount <= 1 ? 'disabled' : ''} class="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors">
+                                    <i data-lucide="minus" class="w-4 h-4"></i>
+                                </button>
+                                <span class="text-white font-bold w-4 text-center">${state.imposterCount}</span>
+                                <button onclick="updateImposterCount(1)" ${state.imposterCount >= maxImposters ? 'disabled' : ''} class="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- Punishments Mode -->
-                        <div class="flex items-center justify-between group">
+                        <!-- Score Limit Setting -->
+                        <div class="glass-card rounded-2xl p-4 flex justify-between items-center border-amber-500/20">
                             <div class="flex items-center space-x-2">
-                                <i data-lucide="flame" class="w-4 h-4 ${state.settings.punishments ? 'text-orange-400' : 'text-slate-500'}"></i>
-                                <div>
-                                    <span class="text-slate-200 text-sm font-medium block">Party Punishments</span>
-                                    <span class="text-slate-500 text-[10px] block">Losers get a random dare</span>
-                                </div>
-                            </div>
-                            <button onclick="toggleSetting('punishments')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 ${state.settings.punishments ? 'bg-orange-600' : 'bg-slate-700'}">
-                                <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.punishments ? 'translate-x-6' : 'translate-x-0'}"></div>
-                            </button>
-                        </div>
-
-                        <!-- Clue Rounds -->
-                        <div class="flex flex-col space-y-2">
-                            <div class="flex items-center space-x-2">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4 text-blue-400"></i>
-                                <span class="text-slate-200 text-sm font-medium">Clue Rounds</span>
+                                <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
+                                <span class="text-white font-semibold">Play To (Wins)</span>
                             </div>
                             <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                                ${[1, 2, 3].map(num => `
-                                    <button onclick="updateSetting('clueRounds', ${num})" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.clueRounds === num ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
+                                ${[1, 3, 5].map(num => `
+                                    <button onclick="updateSetting('scoreLimit', ${num})" class="w-10 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.scoreLimit === num ? 'bg-amber-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
                                         ${num}
                                     </button>
                                 `).join('')}
                             </div>
                         </div>
 
-                        <!-- Timer -->
-                        <div class="flex flex-col space-y-2">
-                            <div class="flex items-center space-x-2">
-                                <i data-lucide="timer" class="w-4 h-4 text-amber-400"></i>
-                                <span class="text-slate-200 text-sm font-medium">Turn Timer</span>
+                        <!-- Advanced Settings -->
+                        <div class="glass-card rounded-2xl p-4 space-y-5 border-blue-500/20">
+                            <div class="flex items-center space-x-2 border-b border-slate-700/50 pb-2">
+                                <i data-lucide="settings-2" class="w-4 h-4 text-purple-400"></i>
+                                <span class="text-white font-semibold text-sm uppercase tracking-wide">Advanced Settings</span>
                             </div>
-                            <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                                ${[{l: 'Off', v: 0}, {l: '5s', v: 5}, {l: '10s', v: 10}, {l: '15s', v: 15}].map(opt => `
-                                    <button onclick="updateSetting('timeLimit', ${opt.v})" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.timeLimit === opt.v ? 'bg-amber-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
-                                        ${opt.l}
-                                    </button>
-                                `).join('')}
+                            
+                            <!-- Blind Mode -->
+                            <div class="flex items-center justify-between group">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="eye-off" class="w-4 h-4 ${state.settings.blindImposter ? 'text-purple-400' : 'text-slate-500'}"></i>
+                                    <div>
+                                        <span class="text-slate-200 text-sm font-medium block">Blind Imposter</span>
+                                        <span class="text-slate-500 text-[10px] block">Hide category from Imposter</span>
+                                    </div>
+                                </div>
+                                <button onclick="toggleSetting('blindImposter')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.blindImposter ? 'bg-purple-600' : 'bg-slate-700'}">
+                                    <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.blindImposter ? 'translate-x-6' : 'translate-x-0'}"></div>
+                                </button>
+                            </div>
+
+                            <!-- Punishments Mode -->
+                            <div class="flex items-center justify-between group">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="flame" class="w-4 h-4 ${state.settings.punishments ? 'text-orange-400' : 'text-slate-500'}"></i>
+                                    <div>
+                                        <span class="text-slate-200 text-sm font-medium block">Party Punishments</span>
+                                        <span class="text-slate-500 text-[10px] block">Losers get a random dare</span>
+                                    </div>
+                                </div>
+                                <button onclick="toggleSetting('punishments')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.punishments ? 'bg-orange-600' : 'bg-slate-700'}">
+                                    <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.punishments ? 'translate-x-6' : 'translate-x-0'}"></div>
+                                </button>
+                            </div>
+
+                            <!-- Clue Rounds -->
+                            <div class="flex flex-col space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <i data-lucide="rotate-ccw" class="w-4 h-4 text-blue-400"></i>
+                                        <span class="text-slate-200 text-sm font-medium">Clues per Round</span>
+                                    </div>
+                                </div>
+                                <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
+                                    ${[1, 2, 3, 4, 5].map(num => `
+                                        <button onclick="updateSetting('clueRounds', ${num})" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.clueRounds === num ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
+                                            ${num}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Timer -->
+                            <div class="flex flex-col space-y-2">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="timer" class="w-4 h-4 text-amber-400"></i>
+                                    <span class="text-slate-200 text-sm font-medium">Turn Timer</span>
+                                </div>
+                                <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
+                                    ${[{l: 'Off', v: 0}, {l: '5s', v: 5}, {l: '10s', v: 10}, {l: '15s', v: 15}].map(opt => `
+                                        <button onclick="updateSetting('timeLimit', ${opt.v})" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.timeLimit === opt.v ? 'bg-amber-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
+                                            ${opt.l}
+                                        </button>
+                                    `).join('')}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <button onclick="setScreen('categories')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] shrink-0 transition-all mb-4 mt-auto">
-                    Choose Category
-                </button>
+                <!-- Bottom Fixed Action Button -->
+                <div class="shrink-0 mt-2">
+                    <button onclick="setScreen('categories')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex justify-center items-center">
+                        Choose Category <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                    </button>
+                </div>
             `;
         }
 
@@ -478,7 +488,7 @@
             
             return `
                 ${topBar('Select Category', true, 'goToSetup')}
-                <div class="flex-1 overflow-y-auto pb-12 pr-1 custom-scrollbar space-y-8">
+                <div class="flex-1 overflow-y-auto pb-4 pr-1 custom-scrollbar space-y-8">
                     <div>
                         <h2 class="text-blue-300 font-bold uppercase tracking-widest text-xs mb-3 px-1">Standard</h2>
                         <div class="grid grid-cols-2 gap-3 sm:gap-4">
@@ -512,7 +522,7 @@
         function renderCreateCustom() {
             return `
                 ${topBar('New Category', true, 'goToCategories')}
-                <div class="flex-1 overflow-y-auto pb-6">
+                <div class="flex-1 overflow-y-auto pb-4 custom-scrollbar">
                     <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-6">
                         ${state.customForm.error ? `
                             <div class="bg-red-500/10 border border-red-500/50 p-3 rounded-xl flex items-start space-x-2 text-red-400 text-sm">
@@ -533,10 +543,14 @@
                         </div>
                     </div>
                 </div>
-                <button onclick="saveCustomCategory()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] mt-auto mb-8 flex items-center justify-center space-x-2 transition-all shrink-0">
-                    <i data-lucide="check" class="w-5 h-5"></i>
-                    <span>Save Category</span>
-                </button>
+                
+                <!-- Bottom Fixed Action Button -->
+                <div class="shrink-0 mt-2">
+                    <button onclick="saveCustomCategory()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center space-x-2 transition-all">
+                        <i data-lucide="check" class="w-5 h-5"></i>
+                        <span>Save Category</span>
+                    </button>
+                </div>
             `;
         }
 
@@ -588,7 +602,7 @@
             }
 
             return `
-                <div class="h-full flex flex-col items-center justify-center p-4">
+                <div class="flex-1 flex flex-col items-center justify-center p-2 sm:p-4">
                     <div class="w-full max-w-sm glass-card rounded-[2rem] p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden border border-slate-700/50">
                         <div class="absolute -top-20 -right-20 w-48 h-48 bg-blue-500 rounded-full blur-[60px] opacity-10 pointer-events-none"></div>
                         <h2 class="text-base sm:text-lg text-blue-200/60 font-semibold mb-2 tracking-wide uppercase">Pass phone to</h2>
@@ -606,13 +620,16 @@
             if (isGameOver) {
                 return `
                     ${topBar('Give Clues', false)}
-                    <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6 pb-10">
+                    <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6 pb-4">
                         <div class="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30 mb-4">
                             <i data-lucide="swords" class="w-12 h-12 text-red-400"></i>
                         </div>
                         <h2 class="text-4xl font-black text-white drop-shadow-md">All Clues Given</h2>
                         <p class="text-slate-300 px-4 text-lg">It's time to interrogate and vote.</p>
-                        <button onclick="setScreen('voting')" class="w-full max-w-xs py-5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(225,29,72,0.3)] mt-8 transition-all">Start Voting</button>
+                    </div>
+                    
+                    <div class="shrink-0 mt-2">
+                        <button onclick="setScreen('voting')" class="w-full py-5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(225,29,72,0.3)] transition-all">Start Voting</button>
                     </div>
                 `;
             }
@@ -642,7 +659,7 @@
 
             return `
                 ${topBar('Give Clues', false)}
-                <div class="flex-1 flex flex-col min-h-0 space-y-4">
+                <div class="flex-1 flex flex-col min-h-0 space-y-4 pb-4">
                     <div class="glass-card rounded-2xl p-4 text-center shrink-0 border border-slate-700/50 flex justify-between items-center bg-indigo-900/10">
                         <div class="text-left">
                             <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Phase</span>
@@ -660,8 +677,11 @@
                         <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-8 truncate drop-shadow-md ${nameColor}">${activePlayer.name.trim() || 'Player'}</h2>
                         ${timerHTML}
                     </div>
+                </div>
 
-                    <button onclick="advanceTurn()" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(79,70,229,0.3)] mt-auto mb-6 flex items-center justify-center transition-all shrink-0">
+                <!-- Bottom Fixed Action Button -->
+                <div class="shrink-0 mt-2">
+                    <button onclick="advanceTurn()" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center transition-all">
                         Next Player
                     </button>
                 </div>
@@ -671,10 +691,10 @@
         function renderVoting() {
             return `
                 ${topBar('Vote Imposter', false)}
-                <div class="text-center mb-6 bg-blue-900/10 py-3 rounded-2xl border border-blue-500/10 shrink-0">
+                <div class="text-center mb-4 sm:mb-6 bg-blue-900/10 py-3 rounded-2xl border border-blue-500/10 shrink-0">
                     <p class="text-blue-200/80 font-medium text-sm sm:text-base">Discuss. Who will you execute?</p>
                 </div>
-                <div class="space-y-3 flex-1 overflow-y-auto pb-8 custom-scrollbar relative">
+                <div class="space-y-3 flex-1 overflow-y-auto pb-4 custom-scrollbar relative">
                     ${state.players.map(player => `
                         <button onclick="openVoteModal(${player.id})" class="w-full flex items-center justify-between p-4 sm:p-5 glass-card hover:bg-white/10 active:scale-95 rounded-2xl transition-all border border-slate-700/50 group">
                             <span class="text-white font-bold text-lg sm:text-xl group-hover:text-blue-200 transition-colors truncate">${player.name.trim() || 'Player'}</span>
@@ -694,7 +714,7 @@
             if (state.settings.punishments && state.game.currentPunishment) {
                 const loserNames = isPlayersWin ? imposterNames : state.players.filter(p => !state.game.imposterIds.includes(p.id)).map(p=>p.name).join(', ');
                 punishmentHTML = `
-                    <div class="glass-card rounded-2xl p-4 mt-4 border border-orange-500/30 bg-orange-950/20 shadow-lg w-full max-w-sm">
+                    <div class="glass-card rounded-2xl p-4 mt-4 border border-orange-500/30 bg-orange-950/20 shadow-lg w-full max-w-sm shrink-0">
                         <div class="flex items-center space-x-2 justify-center mb-2">
                             <i data-lucide="flame" class="w-5 h-5 text-orange-400"></i>
                             <span class="text-orange-300 font-bold uppercase text-xs tracking-widest">Punishment Time</span>
@@ -707,15 +727,15 @@
             }
 
             return `
-                <div class="h-full flex flex-col items-center justify-center text-center space-y-6 sm:space-y-8 relative z-10 overflow-y-auto custom-scrollbar py-8">
+                <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center py-4 space-y-6 sm:space-y-8 relative z-10">
                     
                     <!-- Score Header -->
-                    <div class="absolute top-4 right-4 glass-card px-3 py-1.5 rounded-full border border-slate-700/50 flex space-x-3 items-center">
+                    <div class="absolute top-0 right-0 sm:right-4 glass-card px-3 py-1.5 rounded-full border border-slate-700/50 flex space-x-3 items-center">
                         <i data-lucide="list-ordered" class="w-4 h-4 text-slate-400"></i>
                         <span class="text-xs font-bold text-slate-300">Target: ${state.settings.scoreLimit} Wins</span>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="space-y-4 text-center pt-8">
                         <div class="inline-block relative group">
                             <div class="absolute inset-0 blur-[50px] opacity-30 rounded-full ${isPlayersWin ? 'bg-blue-500' : 'bg-red-500'}"></div>
                             <div class="relative p-6 sm:p-8 rounded-full ${isPlayersWin ? 'bg-blue-500/10 border-blue-500/30' : 'bg-red-500/10 border-red-500/30'} border">
@@ -733,12 +753,12 @@
 
                     <div class="glass-card rounded-3xl p-6 sm:p-8 w-full max-w-sm space-y-5 border border-slate-700/50 shadow-2xl relative overflow-hidden shrink-0">
                         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-slate-500/30 to-transparent"></div>
-                        <div>
+                        <div class="text-center">
                             <p class="text-blue-300 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">Category</p>
                             <p class="text-white text-lg sm:text-xl font-medium">${state.game.category}</p>
                         </div>
                         <div class="h-px bg-slate-800 w-full"></div>
-                        <div>
+                        <div class="text-center">
                             <p class="text-blue-300 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">Secret Word</p>
                             <p class="text-white text-2xl sm:text-3xl font-black tracking-wide">${state.game.secretWord}</p>
                         </div>
@@ -747,7 +767,7 @@
                     ${punishmentHTML}
 
                     <!-- Current Standings -->
-                    <div class="w-full max-w-sm glass-card rounded-2xl p-4 border border-slate-700/50">
+                    <div class="w-full max-w-sm glass-card rounded-2xl p-4 border border-slate-700/50 shrink-0">
                         <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3 text-left">Leaderboard</p>
                         <div class="space-y-2">
                             ${[...state.players].sort((a,b)=>b.score - a.score).slice(0,3).map((p, i) => `
@@ -761,11 +781,12 @@
                             `).join('')}
                         </div>
                     </div>
+                </div>
 
-                    <div class="flex w-full max-w-sm space-x-3 pb-6">
-                        <button onclick="setScreen('setup')" class="flex-1 py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-bold transition-all">Setup</button>
-                        <button onclick="playNextRound()" class="flex-[2] py-4 bg-white text-slate-900 hover:bg-slate-200 active:scale-95 rounded-2xl font-black text-lg shadow-xl transition-all">Next Round</button>
-                    </div>
+                <!-- Bottom Fixed Action Buttons -->
+                <div class="shrink-0 mt-4 flex w-full max-w-sm mx-auto space-x-3">
+                    <button onclick="setScreen('setup')" class="flex-1 py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-bold transition-all">Setup</button>
+                    <button onclick="playNextRound()" class="flex-[2] py-4 bg-white text-slate-900 hover:bg-slate-200 active:scale-95 rounded-2xl font-black text-lg shadow-xl transition-all">Next Round</button>
                 </div>
             `;
         }
@@ -974,7 +995,6 @@
         }
 
         function updateTimerUI() {
-            // Update DOM directly to avoid full re-render on every tick
             const textEl = getEl('turn-timer-text');
             const circleEl = getEl('turn-timer-circle');
             const dashboardEl = getEl('playing-dashboard');
@@ -985,7 +1005,6 @@
                 const timerWarning = state.game.timeLeft <= 3 && state.game.timeLeft > 0;
                 const timerFailed = state.game.timeLeft === 0;
 
-                // Simple class resets
                 circleEl.className = `w-24 h-24 rounded-full border-4 flex items-center justify-center shadow-inner transition-colors duration-300 ${
                     timerWarning ? 'border-amber-500/50 text-amber-400 bg-amber-500/10 animate-pulse-fast' : 
                     timerFailed ? 'border-red-500/50 text-red-500 bg-red-500/10' : 
@@ -1003,7 +1022,6 @@
         }
 
         function confettiEffect() {
-            // Very simple CSS confetti creation for the winner screen
             const modal = getEl('winner-modal');
             for (let i = 0; i < 50; i++) {
                 const conf = document.createElement('div');
@@ -1037,6 +1055,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
