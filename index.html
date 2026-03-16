@@ -1,25 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Settings, 
-  Eye, 
-  MessageSquare, 
-  Search, 
-  ChevronLeft, 
-  Play, 
-  Users, 
-  UserPlus, 
-  Trash2,
-  AlertCircle,
-  Plus,
-  Sparkles,
-  Check,
-  Minus,
-  X,
-  Trophy,
-  Share2,
-  ToggleLeft,
-  ToggleRight
-} from 'lucide-react';
+import { Settings, Eye, MessageSquare, Search, ChevronLeft, Play, Users, UserPlus, Trash2, AlertCircle, Plus, Sparkles, Check, Minus, X, Trophy, Share2, ToggleLeft, ToggleRight } from 'lucide-react';
 
 const injectStyles = () => {
   if (typeof document !== 'undefined' && !document.getElementById('particle-styles')) {
@@ -32,18 +12,9 @@ const injectStyles = () => {
         75% { opacity: var(--max-opacity); transform: translateY(25vh) translateX(calc(var(--drift-x) * -1)); }
         100% { transform: translateY(-10vh) translateX(var(--drift-x)) scale(1.2); opacity: 0; }
       }
-      @keyframes score-pop {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.4); }
-        100% { transform: scale(1); }
-      }
+      @keyframes score-pop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
       .score-pop { animation: score-pop 0.4s ease-out; }
-      .glass-card {
-        background: rgba(26, 31, 46, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
+      .glass-card { background: rgba(26, 31, 46, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
       .custom-scrollbar::-webkit-scrollbar { width: 4px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
       .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
@@ -53,24 +24,23 @@ const injectStyles = () => {
 };
 
 const WORD_DATABASE = {
-  Animals: ['Lion', 'Elephant', 'Giraffe', 'Penguin', 'Kangaroo', 'Dolphin', 'Tiger', 'Bear', 'Wolf', 'Eagle', 'Shark', 'Monkey', 'Zebra', 'Rhinoceros', 'Hippopotamus', 'Crocodile', 'Snake', 'Frog', 'Toad', 'Turtle', 'Cheetah', 'Leopard', 'Panther', 'Gorilla', 'Chimpanzee', 'Orangutan', 'Sloth', 'Armadillo', 'Porcupine', 'Hedgehog', 'Bat', 'Owl', 'Hawk', 'Falcon', 'Seagull', 'Pelican', 'Flamingo', 'Peacock', 'Ostrich', 'Emu', 'Koala', 'Panda'],
-  Food: ['Pizza', 'Sushi', 'Taco', 'Hamburger', 'Pasta', 'Ice Cream', 'Pancake', 'Salad', 'Steak', 'Waffle', 'Burrito', 'Sandwich', 'Hot Dog', 'French Fries', 'Fried Chicken', 'Soup', 'Curry', 'Ramen', 'Dumplings', 'Noodles', 'Bread', 'Cheese', 'Yogurt', 'Oatmeal', 'Cereal', 'Bacon', 'Eggs', 'Sausage', 'Ham', 'Turkey', 'Chicken', 'Beef', 'Pork', 'Fish', 'Shrimp', 'Crab', 'Lobster', 'Apple', 'Banana', 'Orange', 'Grapes', 'Strawberry', 'Chocolate', 'Cake', 'Pie'],
-  Objects: ['Smartphone', 'Laptop', 'Chair', 'Bicycle', 'Camera', 'Television', 'Watch', 'Headphones', 'Backpack', 'Shoes', 'Guitar', 'Glasses', 'Table', 'Bed', 'Sofa', 'Lamp', 'Clock', 'Mirror', 'Book', 'Pen', 'Pencil', 'Notebook', 'Keys', 'Wallet', 'Purse', 'Umbrella', 'Scissors', 'Knife', 'Fork', 'Spoon', 'Plate', 'Bowl', 'Cup', 'Mug', 'Bottle', 'Towel', 'Soap', 'Toothbrush', 'Toothpaste', 'Comb', 'Brush', 'Blanket', 'Pillow'],
-  Locations: ['Beach', 'Mountain', 'Forest', 'Desert', 'City', 'Island', 'Jungle', 'Cave', 'Space Station', 'Castle', 'Hospital', 'School', 'Library', 'Museum', 'Park', 'Zoo', 'Aquarium', 'Theme Park', 'Cinema', 'Theater', 'Restaurant', 'Cafe', 'Bakery', 'Supermarket', 'Mall', 'Airport', 'Train Station', 'Bus Station', 'Hotel', 'Resort', 'Stadium', 'Gym', 'Pool', 'Bank', 'Post Office', 'Police Station', 'Fire Station', 'Church', 'Temple', 'Mosque', 'Farm', 'Village'],
-  Sports: ['Soccer', 'Basketball', 'Tennis', 'Baseball', 'Golf', 'Swimming', 'Volleyball', 'Boxing', 'Rugby', 'Cycling', 'Skiing', 'Cricket', 'Running', 'Jumping', 'Throwing', 'Wrestling', 'Martial Arts', 'Karate', 'Judo', 'Taekwondo', 'Fencing', 'Archery', 'Gymnastics', 'Ice Skating', 'Snowboarding', 'Surfing', 'Skateboarding', 'Roller Skating', 'Hockey', 'Badminton', 'Table Tennis', 'Squash', 'Racquetball', 'Water Polo', 'Diving', 'Rowing', 'Sailing', 'Canoeing', 'Kayaking', 'Equestrian', 'Polo', 'Weightlifting'],
-  Christmas: ['Santa', 'Reindeer', 'Tree', 'Presents', 'Snowman', 'Stocking', 'Elf', 'Sleigh', 'Ornaments', 'Gingerbread', 'Mistletoe', 'Holly', 'Wreath', 'Star', 'Bells', 'Carols', 'Chimney', 'Fireplace', 'Cookies', 'Milk', 'Candy Cane', 'Nutcracker', 'Snow', 'Ice', 'Winter', 'December', 'North Pole', 'Workshop', 'Toys', 'Ribbon', 'Wrapping Paper', 'Bow', 'Lights', 'Tinsel', 'Garland', 'Bauble', 'Nativity', 'Angel', 'Shepherd', 'Wise Men', 'Manger', 'Peace', 'Joy', 'Family'],
-  Tools: ['Hammer', 'Screwdriver', 'Wrench', 'Drill', 'Saw', 'Pliers', 'Level', 'Tape Measure', 'Chisel', 'Mallet', 'Axe', 'Hatchet', 'Crowbar', 'Pry Bar', 'File', 'Rasp', 'Sandpaper', 'Clamp', 'Vise', 'Anvil', 'Tongs', 'Bellows', 'Forge', 'Welder', 'Soldering Iron', 'Multimeter', 'Wire Strippers', 'Crimper', 'Allen Key', 'Hex Key', 'Socket Wrench', 'Ratchet', 'Spanner', 'Pipe Wrench', 'Adjustable Wrench', 'Bolt Cutters', 'Tin Snips', 'Scissors', 'Shears', 'Pruners', 'Trowel', 'Spade'],
-  Vehicles: ['Car', 'Truck', 'Motorcycle', 'Helicopter', 'Airplane', 'Submarine', 'Boat', 'Train', 'Bus', 'Bicycle', 'Scooter', 'Skateboard', 'Rollerblades', 'Tractor', 'Bulldozer', 'Excavator', 'Crane', 'Forklift', 'Ambulance', 'Fire Engine', 'Police Car', 'Taxi', 'Limousine', 'Van', 'Minivan', 'SUV', 'Jeep', 'Convertible', 'Sports Car', 'Race Car', 'Go-Kart', 'Hovercraft', 'Jet Ski', 'Snowmobile', 'Golf Cart', 'Tricycle', 'Unicycle', 'Hot Air Balloon', 'Blimp', 'Zeppelin', 'Spaceship', 'Rocket'],
-  Games: ['Minecraft', 'Monopoly', 'Chess', 'Poker', 'Tetris', 'Fortnite', 'Scrabble', 'Mario Kart', 'Zelda', 'Roblox', 'Checkers', 'Backgammon', 'Go', 'Dominoes', 'Jenga', 'Risk', 'Clue', 'Catan', 'Carcassonne', 'Ticket to Ride', 'Pandemic', 'Splendor', 'Azul', 'Dixit', 'Codenames', 'Uno', 'Skip-Bo', 'Phase 10', 'Cards Against Humanity', 'Apples to Apples', 'Pictionary', 'Charades', 'Twister', 'Hide and Seek', 'Tag', 'Simon Says', 'Musical Chairs', 'Duck Duck Goose', 'Red Light Green Light', 'Hopscotch', 'Jump Rope', 'Pac-Man'],
-  Anime: ['Naruto', 'Dragon Ball', 'One Piece', 'Attack on Titan', 'Death Note', 'My Hero Academia', 'Demon Slayer', 'Bleach', 'Evangelion', 'Pokemon', 'Fullmetal Alchemist', 'Hunter x Hunter', 'Cowboy Bebop', 'Spirited Away', 'Princess Mononoke', 'My Neighbor Totoro', 'Howls Moving Castle', 'Akira', 'Ghost in the Shell', 'Steins;Gate', 'Code Geass', 'Sword Art Online', 'Tokyo Ghoul', 'Fairy Tail', 'One Punch Man', 'Mob Psycho 100', 'Jujutsu Kaisen', 'Chainsaw Man', 'Spy x Family', 'JoJos Bizarre Adventure', 'Gintama', 'Haikyuu', 'Kurokos Basketball', 'Slam Dunk', 'Sailor Moon', 'Cardcaptor Sakura', 'Fruits Basket', 'Ouran High School Host Club', 'Your Lie in April', 'Clannad', 'Angel Beats', 'Toradora'],
-  Superpowers: ['Flight', 'Invisibility', 'Telepathy', 'Strength', 'Time Travel', 'Telekinesis', 'Speed', 'Healing', 'Shapeshifting', 'X-Ray', 'Teleportation', 'Mind Control', 'Force Fields', 'Energy Blasts', 'Elemental Control', 'Fire Manipulation', 'Water Manipulation', 'Earth Manipulation', 'Air Manipulation', 'Ice Manipulation', 'Electricity Manipulation', 'Weather Control', 'Gravity Control', 'Density Control', 'Size Alteration', 'Elasticity', 'Intangibility', 'Immortality', 'Regeneration', 'Invulnerability', 'Super Senses', 'Super Sight', 'Super Hearing', 'Super Smell', 'Animal Communication', 'Plant Control', 'Technopathy', 'Illusion Casting', 'Precognition', 'Clairvoyance', 'Astral Projection', 'Necromancy'],
-  Fears: ['Spiders', 'Heights', 'Darkness', 'Clowns', 'Snakes', 'Speaking', 'Needles', 'Flying', 'Death', 'Ghosts', 'Insects', 'Dogs', 'Cats', 'Birds', 'Fish', 'Water', 'Drowning', 'Fire', 'Burning', 'Enclosed Spaces', 'Crowds', 'Being Alone', 'Rejection', 'Failure', 'Success', 'Change', 'Aging', 'Illness', 'Pain', 'Blood', 'Germs', 'Dirt', 'Thunder', 'Lightning', 'Storms', 'Tornadoes', 'Earthquakes', 'Monsters', 'Aliens', 'Zombies', 'Vampires', 'Werewolves', 'Demons']
+  Animals: ['Lion','Elephant','Giraffe','Penguin','Kangaroo','Dolphin','Tiger','Bear','Wolf','Eagle','Shark','Monkey','Zebra','Rhinoceros','Hippopotamus','Crocodile','Snake','Frog','Toad','Turtle','Cheetah','Leopard','Panther','Gorilla','Chimpanzee','Orangutan','Sloth','Armadillo','Porcupine','Hedgehog','Bat','Owl','Hawk','Falcon','Seagull','Pelican','Flamingo','Peacock','Ostrich','Emu','Koala','Panda'],
+  Food: ['Pizza','Sushi','Taco','Hamburger','Pasta','Ice Cream','Pancake','Salad','Steak','Waffle','Burrito','Sandwich','Hot Dog','French Fries','Fried Chicken','Soup','Curry','Ramen','Dumplings','Noodles','Bread','Cheese','Yogurt','Oatmeal','Cereal','Bacon','Eggs','Sausage','Ham','Turkey','Chicken','Beef','Pork','Fish','Shrimp','Crab','Lobster','Apple','Banana','Orange','Grapes','Strawberry','Chocolate','Cake','Pie'],
+  Objects: ['Smartphone','Laptop','Chair','Bicycle','Camera','Television','Watch','Headphones','Backpack','Shoes','Guitar','Glasses','Table','Bed','Sofa','Lamp','Clock','Mirror','Book','Pen','Pencil','Notebook','Keys','Wallet','Purse','Umbrella','Scissors','Knife','Fork','Spoon','Plate','Bowl','Cup','Mug','Bottle','Towel','Soap','Toothbrush','Toothpaste','Comb','Brush','Blanket','Pillow'],
+  Locations: ['Beach','Mountain','Forest','Desert','City','Island','Jungle','Cave','Space Station','Castle','Hospital','School','Library','Museum','Park','Zoo','Aquarium','Theme Park','Cinema','Theater','Restaurant','Cafe','Bakery','Supermarket','Mall','Airport','Train Station','Bus Station','Hotel','Resort','Stadium','Gym','Pool','Bank','Post Office','Police Station','Fire Station','Church','Temple','Mosque','Farm','Village'],
+  Sports: ['Soccer','Basketball','Tennis','Baseball','Golf','Swimming','Volleyball','Boxing','Rugby','Cycling','Skiing','Cricket','Running','Jumping','Throwing','Wrestling','Martial Arts','Karate','Judo','Taekwondo','Fencing','Archery','Gymnastics','Ice Skating','Snowboarding','Surfing','Skateboarding','Roller Skating','Hockey','Badminton','Table Tennis','Squash','Racquetball','Water Polo','Diving','Rowing','Sailing','Canoeing','Kayaking','Equestrian','Polo','Weightlifting'],
+  Christmas: ['Santa','Reindeer','Tree','Presents','Snowman','Stocking','Elf','Sleigh','Ornaments','Gingerbread','Mistletoe','Holly','Wreath','Star','Bells','Carols','Chimney','Fireplace','Cookies','Milk','Candy Cane','Nutcracker','Snow','Ice','Winter','December','North Pole','Workshop','Toys','Ribbon','Wrapping Paper','Bow','Lights','Tinsel','Garland','Bauble','Nativity','Angel','Shepherd','Wise Men','Manger','Peace','Joy','Family'],
+  Tools: ['Hammer','Screwdriver','Wrench','Drill','Saw','Pliers','Level','Tape Measure','Chisel','Mallet','Axe','Hatchet','Crowbar','Pry Bar','File','Rasp','Sandpaper','Clamp','Vise','Anvil','Tongs','Bellows','Forge','Welder','Soldering Iron','Multimeter','Wire Strippers','Crimper','Allen Key','Hex Key','Socket Wrench','Ratchet','Spanner','Pipe Wrench','Adjustable Wrench','Bolt Cutters','Tin Snips','Scissors','Shears','Pruners','Trowel','Spade'],
+  Vehicles: ['Car','Truck','Motorcycle','Helicopter','Airplane','Submarine','Boat','Train','Bus','Bicycle','Scooter','Skateboard','Rollerblades','Tractor','Bulldozer','Excavator','Crane','Forklift','Ambulance','Fire Engine','Police Car','Taxi','Limousine','Van','Minivan','SUV','Jeep','Convertible','Sports Car','Race Car','Go-Kart','Hovercraft','Jet Ski','Snowmobile','Golf Cart','Tricycle','Unicycle','Hot Air Balloon','Blimp','Zeppelin','Spaceship','Rocket'],
+  Games: ['Minecraft','Monopoly','Chess','Poker','Tetris','Fortnite','Scrabble','Mario Kart','Zelda','Roblox','Checkers','Backgammon','Go','Dominoes','Jenga','Risk','Clue','Catan','Carcassonne','Ticket to Ride','Pandemic','Splendor','Azul','Dixit','Codenames','Uno','Skip-Bo','Phase 10','Cards Against Humanity','Apples to Apples','Pictionary','Charades','Twister','Hide and Seek','Tag','Simon Says','Musical Chairs','Duck Duck Goose','Red Light Green Light','Hopscotch','Jump Rope','Pac-Man'],
+  Anime: ['Naruto','Dragon Ball','One Piece','Attack on Titan','Death Note','My Hero Academia','Demon Slayer','Bleach','Evangelion','Pokemon','Fullmetal Alchemist','Hunter x Hunter','Cowboy Bebop','Spirited Away','Princess Mononoke','My Neighbor Totoro','Howls Moving Castle','Akira','Ghost in the Shell','Steins;Gate','Code Geass','Sword Art Online','Tokyo Ghoul','Fairy Tail','One Punch Man','Mob Psycho 100','Jujutsu Kaisen','Chainsaw Man','Spy x Family','JoJos Bizarre Adventure','Gintama','Haikyuu','Kurokos Basketball','Slam Dunk','Sailor Moon','Cardcaptor Sakura','Fruits Basket','Ouran High School Host Club','Your Lie in April','Clannad','Angel Beats','Toradora'],
+  Superpowers: ['Flight','Invisibility','Telepathy','Strength','Time Travel','Telekinesis','Speed','Healing','Shapeshifting','X-Ray','Teleportation','Mind Control','Force Fields','Energy Blasts','Elemental Control','Fire Manipulation','Water Manipulation','Earth Manipulation','Air Manipulation','Ice Manipulation','Electricity Manipulation','Weather Control','Gravity Control','Density Control','Size Alteration','Elasticity','Intangibility','Immortality','Regeneration','Invulnerability','Super Senses','Super Sight','Super Hearing','Super Smell','Animal Communication','Plant Control','Technopathy','Illusion Casting','Precognition','Clairvoyance','Astral Projection','Necromancy'],
+  Fears: ['Spiders','Heights','Darkness','Clowns','Snakes','Speaking','Needles','Flying','Death','Ghosts','Insects','Dogs','Cats','Birds','Fish','Water','Drowning','Fire','Burning','Enclosed Spaces','Crowds','Being Alone','Rejection','Failure','Success','Change','Aging','Illness','Pain','Blood','Germs','Dirt','Thunder','Lightning','Storms','Tornadoes','Earthquakes','Monsters','Aliens','Zombies','Vampires','Werewolves','Demons']
 };
 
 const INITIAL_CATEGORIES = Object.keys(WORD_DATABASE).map(name => ({
-  name,
-  words: WORD_DATABASE[name].length,
-  type: ['Animals', 'Food', 'Objects', 'Locations', 'Sports', 'Christmas'].includes(name) ? 'free' : 'pro'
+  name, words: WORD_DATABASE[name].length,
+  type: ['Animals','Food','Objects','Locations','Sports','Christmas'].includes(name) ? 'free' : 'pro'
 }));
 
 const PLAYER_EMOJIS = ['😀','😎','🤠','🥷','👻','🤖','👽','🦊','🐼','🦁','🐯','🦄','🐸','🦋','🐺','🦅','🐲','🎭','🧙','🕵️','🧛','🤡','👾','🎃'];
@@ -90,7 +60,6 @@ const FloatingParticles = () => {
     duration: Math.random() * 20 + 15, delay: Math.random() * -30,
     opacity: Math.random() * 0.15 + 0.05, driftX: `${Math.random() * 60 - 30}px`
   })), []);
-
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
       {particles.map(p => (
@@ -121,19 +90,16 @@ export default function App() {
   const [customError, setCustomError] = useState('');
   const [pendingVoteId, setPendingVoteId] = useState(null);
   const [houseRules, setHouseRules] = useState(DEFAULT_HOUSE_RULES);
-  const [emojiPickerFor, setEmojiPickerFor] = useState(null); // player id
+  const [emojiPickerFor, setEmojiPickerFor] = useState(null);
   const [shareToast, setShareToast] = useState(false);
   const [scorePopId, setScorePopId] = useState(null);
-
   const [gameState, setGameState] = useState({
     category: '', secretWord: '', imposterIds: [],
     currentPlayerIndex: 0, roleRevealed: false, winner: null, shuffledPlayers: []
   });
 
   const maxImposters = Math.max(1, players.length - 2);
-  useEffect(() => {
-    if (imposterCount > maxImposters) setImposterCount(maxImposters);
-  }, [players.length, maxImposters, imposterCount]);
+  useEffect(() => { if (imposterCount > maxImposters) setImposterCount(maxImposters); }, [players.length, maxImposters, imposterCount]);
 
   const addPlayer = () => {
     if (players.length < 12) {
@@ -142,23 +108,10 @@ export default function App() {
       setPlayers([...players, { id: Date.now(), name: `Player ${players.length + 1}`, emoji: nextEmoji, score: 0 }]);
     }
   };
-
-  const removePlayer = (id) => {
-    if (players.length > 3) setPlayers(players.filter(p => p.id !== id));
-  };
-
-  const updatePlayerName = (id, newName) => {
-    setPlayers(players.map(p => p.id === id ? { ...p, name: newName } : p));
-  };
-
-  const updatePlayerEmoji = (id, emoji) => {
-    setPlayers(players.map(p => p.id === id ? { ...p, emoji } : p));
-    setEmojiPickerFor(null);
-  };
-
-  const toggleHouseRule = (id) => {
-    setHouseRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
-  };
+  const removePlayer = (id) => { if (players.length > 3) setPlayers(players.filter(p => p.id !== id)); };
+  const updatePlayerName = (id, newName) => setPlayers(players.map(p => p.id === id ? { ...p, name: newName } : p));
+  const updatePlayerEmoji = (id, emoji) => { setPlayers(players.map(p => p.id === id ? { ...p, emoji } : p)); setEmojiPickerFor(null); };
+  const toggleHouseRule = (id) => setHouseRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
 
   const handleCreateCustomCategory = () => {
     const name = customForm.name.trim();
@@ -173,10 +126,7 @@ export default function App() {
 
   const startGameWithCategory = (categoryName) => {
     let words = WORD_DATABASE[categoryName];
-    if (!words) {
-      const custom = customCategories.find(c => c.name === categoryName);
-      if (custom) words = custom.wordList;
-    }
+    if (!words) { const custom = customCategories.find(c => c.name === categoryName); if (custom) words = custom.wordList; }
     if (!words || words.length === 0) return;
     const randomWord = words[Math.floor(Math.random() * words.length)];
     const shuffledForImposters = [...players].sort(() => Math.random() - 0.5);
@@ -189,39 +139,18 @@ export default function App() {
   const nextReveal = () => {
     if (gameState.currentPlayerIndex < players.length - 1) {
       setGameState(prev => ({ ...prev, currentPlayerIndex: prev.currentPlayerIndex + 1, roleRevealed: false }));
-    } else {
-      setScreen('playing');
-    }
+    } else { setScreen('playing'); }
   };
 
   const handleVote = (suspectId) => {
     const impostersCaught = gameState.imposterIds.includes(suspectId);
-    const winner = impostersCaught ? 'players' : 'imposter';
-    setGameState(prev => ({ ...prev, winner }));
+    setGameState(prev => ({ ...prev, winner: impostersCaught ? 'players' : 'imposter' }));
     setPendingVoteId(null);
-
-    // Update scores
     if (impostersCaught) {
-      // Innocents score a point each
       const winnerIds = players.filter(p => !gameState.imposterIds.includes(p.id)).map(p => p.id);
-      setPlayers(prev => prev.map(p => {
-        if (winnerIds.includes(p.id)) {
-          setScorePopId(p.id);
-          setTimeout(() => setScorePopId(null), 500);
-          return { ...p, score: p.score + 1 };
-        }
-        return p;
-      }));
+      setPlayers(prev => prev.map(p => winnerIds.includes(p.id) ? { ...p, score: p.score + 1 } : p));
     } else {
-      // Imposters score a point each
-      setPlayers(prev => prev.map(p => {
-        if (gameState.imposterIds.includes(p.id)) {
-          setScorePopId(p.id);
-          setTimeout(() => setScorePopId(null), 500);
-          return { ...p, score: p.score + 1 };
-        }
-        return p;
-      }));
+      setPlayers(prev => prev.map(p => gameState.imposterIds.includes(p.id) ? { ...p, score: p.score + 1 } : p));
     }
     setScreen('result');
   };
@@ -234,49 +163,27 @@ export default function App() {
 
   const handleShare = () => {
     const isImposterCaught = gameState.winner === 'players';
-    const imposterNames = players.filter(p => gameState.imposterIds.includes(p.id)).map(p => `${p.emoji} ${p.name}`).join(' & ');
-    const text = `🕵️ IMPOSTER GAME RESULT\n\n` +
-      `${isImposterCaught ? '✅ Imposter CAUGHT!' : '❌ Imposter ESCAPED!'}\n` +
-      `Category: ${gameState.category}\n` +
-      `Secret Word: ${gameState.secretWord}\n` +
-      `Imposter: ${imposterNames}\n\n` +
-      `🏆 Scores:\n` +
-      [...players].sort((a, b) => b.score - a.score).map(p => `${p.emoji} ${p.name}: ${p.score} pts`).join('\n');
-
-    if (navigator.share) {
-      navigator.share({ title: 'Imposter Game', text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).then(() => {
-        setShareToast(true);
-        setTimeout(() => setShareToast(false), 2500);
-      }).catch(() => {});
-    }
+    const imposters = players.filter(p => gameState.imposterIds.includes(p.id));
+    const text = `🕵️ IMPOSTER GAME RESULT\n\n${isImposterCaught ? '✅ Imposter CAUGHT!' : '❌ Imposter ESCAPED!'}\nCategory: ${gameState.category}\nSecret Word: ${gameState.secretWord}\nImposter: ${imposters.map(p => `${p.emoji} ${p.name}`).join(' & ')}\n\n🏆 Scores:\n${[...players].sort((a,b) => b.score - a.score).map(p => `${p.emoji} ${p.name}: ${p.score} pts`).join('\n')}`;
+    if (navigator.share) { navigator.share({ title: 'Imposter Game', text }).catch(() => {}); }
+    else { navigator.clipboard.writeText(text).then(() => { setShareToast(true); setTimeout(() => setShareToast(false), 2500); }).catch(() => {}); }
   };
 
-  // --- UI Components ---
   const TopBar = ({ title, showBack = true, onBack, rightAction }) => (
     <div className="flex items-center mb-6 pt-6 relative z-10 shrink-0">
-      {showBack && (
-        <button onClick={onBack} className="p-2 -ml-2 text-slate-300 hover:text-white transition-colors bg-white/5 rounded-full backdrop-blur-sm mr-3">
-          <ChevronLeft size={24} />
-        </button>
-      )}
+      {showBack && <button onClick={onBack} className="p-2 -ml-2 text-slate-300 hover:text-white transition-colors bg-white/5 rounded-full backdrop-blur-sm mr-3"><ChevronLeft size={24} /></button>}
       <h1 className="text-2xl font-bold text-white tracking-wide flex-1">{title}</h1>
       {rightAction}
     </div>
   );
 
   const CategoryGridItem = ({ cat }) => {
-    const isPro = cat.type === 'pro';
-    const isCustom = cat.type === 'custom';
+    const isPro = cat.type === 'pro', isCustom = cat.type === 'custom';
     return (
       <button onClick={() => startGameWithCategory(cat.name)}
-        className={`relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl aspect-[4/3] text-left transition-all active:scale-95 overflow-hidden group
-          ${isPro ? 'bg-gradient-to-br from-[#1a1c29] to-[#2d2411] border border-amber-500/30 hover:border-amber-400'
-            : isCustom ? 'bg-gradient-to-br from-[#1c1229] to-[#2d112b] border border-fuchsia-500/30 hover:border-fuchsia-400'
-            : 'glass-card hover:bg-white/10 border-blue-500/20 hover:border-blue-400'}`}>
+        className={`relative flex flex-col justify-between p-4 rounded-2xl aspect-[4/3] text-left transition-all active:scale-95 overflow-hidden group ${isPro ? 'bg-gradient-to-br from-[#1a1c29] to-[#2d2411] border border-amber-500/30 hover:border-amber-400' : isCustom ? 'bg-gradient-to-br from-[#1c1229] to-[#2d112b] border border-fuchsia-500/30 hover:border-fuchsia-400' : 'glass-card hover:bg-white/10 border-blue-500/20 hover:border-blue-400'}`}>
         <div className="flex justify-between items-start relative z-10 w-full">
-          <h3 className="text-white font-bold text-base sm:text-lg leading-tight w-[70%] break-words">{cat.name}</h3>
+          <h3 className="text-white font-bold text-base leading-tight w-[70%] break-words">{cat.name}</h3>
           {isPro && <div className="bg-amber-500/20 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center space-x-1 border border-amber-500/50"><Sparkles size={10} /><span>PRO</span></div>}
         </div>
         <div className="flex items-center space-x-2 relative z-10 mt-auto pt-2">
@@ -287,32 +194,26 @@ export default function App() {
     );
   };
 
-  // --- Screens ---
   const renderHome = () => (
     <div className="flex flex-col items-center justify-center h-full space-y-12 animate-in fade-in duration-500 relative z-10">
       <div className="text-center space-y-6">
         <div className="relative inline-block group">
-          <div className="absolute inset-0 bg-blue-500 blur-[40px] opacity-30 rounded-full group-hover:opacity-50 transition-opacity duration-700"></div>
+          <div className="absolute inset-0 bg-blue-500 blur-[40px] opacity-30 rounded-full"></div>
           <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 p-6 rounded-3xl border border-slate-700 shadow-2xl">
             <Search size={64} className="text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]" />
           </div>
         </div>
         <div>
-          <h1 className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-slate-400 tracking-tighter drop-shadow-lg mb-2">IMPOSTER</h1>
-          <p className="text-blue-200/60 text-base sm:text-lg font-medium tracking-wide">Find the liar among you</p>
+          <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-slate-400 tracking-tighter drop-shadow-lg mb-2">IMPOSTER</h1>
+          <p className="text-blue-200/60 text-base font-medium tracking-wide">Find the liar among you</p>
         </div>
       </div>
-      <div className="w-full max-w-[280px] sm:max-w-xs space-y-4">
-        <button onClick={() => setScreen('setup')}
-          className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex items-center justify-center space-x-2">
+      <div className="w-full max-w-[280px] space-y-4">
+        <button onClick={() => setScreen('setup')} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex items-center justify-center space-x-2">
           <Play size={24} fill="currentColor" /><span>Play Now</span>
         </button>
-        <button onClick={() => setScreen('howToPlay')}
-          className="w-full py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-semibold text-lg transition-all">
-          How to Play
-        </button>
-        <button onClick={() => setScreen('houseRules')}
-          className="w-full py-3 glass-card hover:bg-white/10 active:scale-95 text-slate-300 hover:text-white rounded-2xl font-semibold text-base transition-all flex items-center justify-center space-x-2">
+        <button onClick={() => setScreen('howToPlay')} className="w-full py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-semibold text-lg transition-all">How to Play</button>
+        <button onClick={() => setScreen('houseRules')} className="w-full py-3 glass-card hover:bg-white/10 active:scale-95 text-slate-300 hover:text-white rounded-2xl font-semibold text-base transition-all flex items-center justify-center space-x-2">
           <Settings size={18} /><span>House Rules</span>
         </button>
       </div>
@@ -323,7 +224,7 @@ export default function App() {
     <div className="h-full flex flex-col animate-in slide-in-from-right-4 duration-300 relative z-10">
       <TopBar title="House Rules" onBack={() => setScreen('home')} />
       <div className="flex-1 overflow-y-auto space-y-3 pb-12 pr-1 custom-scrollbar">
-        <p className="text-slate-400 text-sm mb-5">Toggle rules on or off for your group. Active rules are shown during the game.</p>
+        <p className="text-slate-400 text-sm mb-5">Toggle rules on or off for your group.</p>
         {houseRules.map(rule => (
           <button key={rule.id} onClick={() => toggleHouseRule(rule.id)}
             className={`w-full glass-card p-4 rounded-2xl flex items-center justify-between space-x-4 transition-all border ${rule.enabled ? 'border-blue-500/40 bg-blue-500/5' : 'border-slate-700/50'}`}>
@@ -339,14 +240,11 @@ export default function App() {
             </div>
           </button>
         ))}
-        {/* Active rules summary */}
         {houseRules.some(r => r.enabled) && (
           <div className="mt-4 p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20">
             <p className="text-blue-300 text-xs font-bold uppercase tracking-widest mb-2">Active This Game</p>
             {houseRules.filter(r => r.enabled).map(r => (
-              <p key={r.id} className="text-slate-300 text-xs py-1 flex items-center space-x-2">
-                <span className="text-blue-400">•</span><span>{r.label}</span>
-              </p>
+              <p key={r.id} className="text-slate-300 text-xs py-1 flex items-center space-x-2"><span className="text-blue-400">•</span><span>{r.label}</span></p>
             ))}
           </div>
         )}
@@ -362,16 +260,11 @@ export default function App() {
           { icon: Settings, title: 'Setup Game', desc: 'Choose players, adjust imposters, and pick a category.' },
           { icon: Eye, title: 'Reveal Words', desc: 'Everyone sees the secret word except the imposter(s).' },
           { icon: MessageSquare, title: 'Give Clues', desc: 'Take turns saying exactly ONE word related to your secret.' },
-          { icon: Search, title: 'Find the Imposter', desc: "Discuss and vote. If you execute an imposter, players win!" },
+          { icon: Search, title: 'Find the Imposter', desc: 'Discuss and vote. If you execute an imposter, players win!' },
         ].map((step, i) => (
-          <div key={i} className="glass-card p-4 sm:p-5 rounded-2xl flex items-start space-x-4">
-            <div className="bg-blue-500/10 p-3 rounded-full flex-shrink-0 mt-1 border border-blue-500/20">
-              <step.icon size={24} className="text-blue-400" />
-            </div>
-            <div>
-              <h3 className="text-white font-bold text-base sm:text-lg mb-1">{step.title}</h3>
-              <p className="text-slate-300 leading-relaxed text-sm">{step.desc}</p>
-            </div>
+          <div key={i} className="glass-card p-4 rounded-2xl flex items-start space-x-4">
+            <div className="bg-blue-500/10 p-3 rounded-full flex-shrink-0 mt-1 border border-blue-500/20"><step.icon size={24} className="text-blue-400" /></div>
+            <div><h3 className="text-white font-bold text-base mb-1">{step.title}</h3><p className="text-slate-300 leading-relaxed text-sm">{step.desc}</p></div>
           </div>
         ))}
       </div>
@@ -385,78 +278,47 @@ export default function App() {
           <button onClick={() => setScreen('scoreboard')} className="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 px-3 py-1.5 rounded-full text-xs font-bold transition-all">
             <Trophy size={13} /><span>Scores</span>
           </button>
-        }
-      />
-
-      {/* Emoji picker overlay */}
+        } />
       {emojiPickerFor !== null && (
         <div className="absolute inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" onClick={() => setEmojiPickerFor(null)}>
           <div className="w-full glass-card rounded-t-3xl p-5 border-t border-slate-700" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <p className="text-white font-bold text-base">Choose Emoji</p>
+              <p className="text-white font-bold">Choose Emoji</p>
               <button onClick={() => setEmojiPickerFor(null)} className="text-slate-400 hover:text-white"><X size={20} /></button>
             </div>
             <div className="grid grid-cols-8 gap-2">
               {PLAYER_EMOJIS.map(emoji => (
-                <button key={emoji} onClick={() => updatePlayerEmoji(emojiPickerFor, emoji)}
-                  className="text-2xl p-2 rounded-xl hover:bg-white/10 active:scale-90 transition-all text-center leading-none">
-                  {emoji}
-                </button>
+                <button key={emoji} onClick={() => updatePlayerEmoji(emojiPickerFor, emoji)} className="text-2xl p-2 rounded-xl hover:bg-white/10 active:scale-90 transition-all text-center leading-none">{emoji}</button>
               ))}
             </div>
           </div>
         </div>
       )}
-
-      <div className="glass-card rounded-3xl p-4 sm:p-5 mb-4 flex-1 overflow-hidden flex flex-col">
+      <div className="glass-card rounded-3xl p-4 mb-4 flex-1 overflow-hidden flex flex-col">
         <div className="flex justify-between items-center mb-4 shrink-0">
-          <span className="text-white font-semibold flex items-center text-base sm:text-lg">
-            <Users size={20} className="mr-2 text-blue-400" /> {players.length} Players
-          </span>
-          {players.length < 12 && (
-            <button onClick={addPlayer} className="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-white px-3 py-1.5 rounded-full flex items-center text-sm font-semibold transition-colors">
-              <UserPlus size={16} className="mr-1" /> Add
-            </button>
-          )}
+          <span className="text-white font-semibold flex items-center"><Users size={20} className="mr-2 text-blue-400" />{players.length} Players</span>
+          {players.length < 12 && <button onClick={addPlayer} className="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 px-3 py-1.5 rounded-full flex items-center text-sm font-semibold transition-colors"><UserPlus size={16} className="mr-1" />Add</button>}
         </div>
         <div className="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4">
           {players.map((player, index) => (
-            <div key={player.id} className="flex items-center space-x-2 group animate-in slide-in-from-left-2">
-              {/* Emoji button */}
-              <button onClick={() => setEmojiPickerFor(player.id)}
-                className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xl shrink-0 hover:border-blue-500/50 transition-colors active:scale-90">
-                {player.emoji}
-              </button>
+            <div key={player.id} className="flex items-center space-x-2">
+              <button onClick={() => setEmojiPickerFor(player.id)} className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xl shrink-0 hover:border-blue-500/50 transition-colors active:scale-90">{player.emoji}</button>
               <input type="text" value={player.name} onChange={(e) => updatePlayerName(player.id, e.target.value)}
-                className="flex-1 bg-black/20 border border-slate-700/50 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all"
-                placeholder={`Player ${index + 1}`} />
-              {/* Score badge */}
-              <div className={`w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0 ${scorePopId === player.id ? 'score-pop' : ''}`}>
-                {player.score}
-              </div>
-              {players.length > 3 && (
-                <button onClick={() => removePlayer(player.id)} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all">
-                  <Trash2 size={18} />
-                </button>
-              )}
+                className="flex-1 bg-black/20 border border-slate-700/50 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 transition-all" placeholder={`Player ${index + 1}`} />
+              <div className={`w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0 ${scorePopId === player.id ? 'score-pop' : ''}`}>{player.score}</div>
+              {players.length > 3 && <button onClick={() => removePlayer(player.id)} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"><Trash2 size={18} /></button>}
             </div>
           ))}
         </div>
       </div>
-
       <div className="glass-card rounded-2xl p-4 mb-4 flex justify-between items-center shrink-0 border-blue-500/20">
-        <div className="flex items-center space-x-2">
-          <AlertCircle size={20} className="text-red-400" />
-          <span className="text-white font-semibold">Imposters</span>
-        </div>
+        <div className="flex items-center space-x-2"><AlertCircle size={20} className="text-red-400" /><span className="text-white font-semibold">Imposters</span></div>
         <div className="flex items-center space-x-4 bg-black/30 rounded-xl p-1 border border-slate-700/50">
           <button onClick={() => setImposterCount(Math.max(1, imposterCount - 1))} disabled={imposterCount <= 1} className="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"><Minus size={18} /></button>
           <span className="text-white font-bold w-4 text-center">{imposterCount}</span>
           <button onClick={() => setImposterCount(Math.min(maxImposters, imposterCount + 1))} disabled={imposterCount >= maxImposters} className="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"><Plus size={18} /></button>
         </div>
       </div>
-
-      {/* Active house rules indicator */}
       {houseRules.some(r => r.enabled) && (
         <div className="flex items-center space-x-2 mb-4 px-1 shrink-0">
           <div className="w-2 h-2 rounded-full bg-blue-400"></div>
@@ -464,9 +326,7 @@ export default function App() {
           <button onClick={() => setScreen('houseRules')} className="text-blue-400 text-xs underline">edit</button>
         </div>
       )}
-
-      <button onClick={() => setScreen('categories')}
-        className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] shrink-0 transition-all mb-8">
+      <button onClick={() => setScreen('categories')} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] shrink-0 transition-all mb-8">
         Choose Category
       </button>
     </div>
@@ -486,20 +346,14 @@ export default function App() {
               <div className="flex-1 min-w-0">
                 <p className="text-white font-bold text-base truncate">{player.name}</p>
                 <div className="mt-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                  <div className={`h-full rounded-full transition-all duration-700 ${idx === 0 && player.score > 0 ? 'bg-amber-400' : 'bg-blue-500'}`}
-                    style={{ width: `${(player.score / maxScore) * 100}%` }} />
+                  <div className={`h-full rounded-full transition-all duration-700 ${idx === 0 && player.score > 0 ? 'bg-amber-400' : 'bg-blue-500'}`} style={{ width: `${(player.score / maxScore) * 100}%` }} />
                 </div>
               </div>
               <div className={`text-2xl font-black shrink-0 ${idx === 0 && player.score > 0 ? 'text-amber-400' : 'text-white'}`}>{player.score}</div>
             </div>
           ))}
-          <button onClick={() => {
-            if (window.confirm('Reset all scores to zero?')) {
-              setPlayers(prev => prev.map(p => ({ ...p, score: 0 })));
-            }
-          }} className="w-full py-3 text-slate-500 hover:text-red-400 text-sm font-medium transition-colors mt-2">
-            Reset All Scores
-          </button>
+          <button onClick={() => { if (window.confirm('Reset all scores to zero?')) setPlayers(prev => prev.map(p => ({ ...p, score: 0 }))); }}
+            className="w-full py-3 text-slate-500 hover:text-red-400 text-sm font-medium transition-colors mt-2">Reset All Scores</button>
         </div>
       </div>
     );
@@ -514,22 +368,19 @@ export default function App() {
         <div className="flex-1 overflow-y-auto pb-12 pr-1 custom-scrollbar space-y-8">
           <div>
             <h2 className="text-blue-300 font-bold uppercase tracking-widest text-xs mb-3 px-1">Standard</h2>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">{freeCats.map((cat, i) => <CategoryGridItem key={i} cat={cat} />)}</div>
+            <div className="grid grid-cols-2 gap-3">{freeCats.map((cat, i) => <CategoryGridItem key={i} cat={cat} />)}</div>
           </div>
           <div>
             <h2 className="text-amber-400/80 font-bold uppercase tracking-widest text-xs mb-3 px-1 flex items-center space-x-1"><Sparkles size={12} /><span>PRO Categories</span></h2>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">{proCats.map((cat, i) => <CategoryGridItem key={i} cat={cat} />)}</div>
+            <div className="grid grid-cols-2 gap-3">{proCats.map((cat, i) => <CategoryGridItem key={i} cat={cat} />)}</div>
           </div>
           <div>
             <h2 className="text-fuchsia-400/80 font-bold uppercase tracking-widest text-xs mb-3 px-1">Your Categories</h2>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {customCategories.map((cat, i) => <CategoryGridItem key={i} cat={cat} />)}
-              <button onClick={() => setScreen('createCustom')}
-                className="relative flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl aspect-[4/3] transition-all active:scale-95 glass-card border-dashed border-2 border-slate-600 hover:border-blue-400 hover:bg-blue-500/5 group">
-                <div className="bg-slate-800 group-hover:bg-blue-500/20 p-2 sm:p-3 rounded-full mb-2 transition-colors">
-                  <Plus size={24} className="text-slate-400 group-hover:text-blue-400 transition-colors" />
-                </div>
-                <span className="text-slate-300 font-bold text-xs sm:text-sm">Create New</span>
+              <button onClick={() => setScreen('createCustom')} className="relative flex flex-col items-center justify-center p-4 rounded-2xl aspect-[4/3] transition-all active:scale-95 glass-card border-dashed border-2 border-slate-600 hover:border-blue-400 hover:bg-blue-500/5 group">
+                <div className="bg-slate-800 group-hover:bg-blue-500/20 p-3 rounded-full mb-2 transition-colors"><Plus size={24} className="text-slate-400 group-hover:text-blue-400 transition-colors" /></div>
+                <span className="text-slate-300 font-bold text-sm">Create New</span>
               </button>
             </div>
           </div>
@@ -542,29 +393,22 @@ export default function App() {
     <div className="h-full flex flex-col animate-in slide-in-from-right-4 duration-300 relative z-10">
       <TopBar title="New Category" onBack={() => setScreen('categories')} />
       <div className="flex-1 overflow-y-auto pb-6">
-        <div className="glass-card rounded-3xl p-5 sm:p-6 space-y-6">
-          {customError && (
-            <div className="bg-red-500/10 border border-red-500/50 p-3 rounded-xl flex items-start space-x-2 text-red-400 text-sm">
-              <AlertCircle size={18} className="shrink-0 mt-0.5" /><span>{customError}</span>
-            </div>
-          )}
+        <div className="glass-card rounded-3xl p-5 space-y-6">
+          {customError && <div className="bg-red-500/10 border border-red-500/50 p-3 rounded-xl flex items-start space-x-2 text-red-400 text-sm"><AlertCircle size={18} className="shrink-0 mt-0.5" /><span>{customError}</span></div>}
           <div className="space-y-2">
-            <label className="text-xs sm:text-sm font-bold text-blue-300 uppercase tracking-wider">Category Name</label>
-            <input type="text" value={customForm.name} onChange={(e) => setCustomForm({ ...customForm, name: e.target.value })}
-              placeholder="e.g. Marvel Characters"
+            <label className="text-xs font-bold text-blue-300 uppercase tracking-wider">Category Name</label>
+            <input type="text" value={customForm.name} onChange={(e) => setCustomForm({ ...customForm, name: e.target.value })} placeholder="e.g. Marvel Characters"
               className="w-full bg-black/30 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-all placeholder:text-slate-600 font-medium" />
           </div>
           <div className="space-y-2">
-            <label className="text-xs sm:text-sm font-bold text-blue-300 uppercase tracking-wider">Words</label>
-            <p className="text-[10px] sm:text-xs text-slate-400 pb-1">Separate words with commas</p>
-            <textarea value={customForm.wordsText} onChange={(e) => setCustomForm({ ...customForm, wordsText: e.target.value })}
-              placeholder="Iron Man, Thor, Hulk, Spider-Man, Black Widow..."
-              className="w-full h-40 sm:h-48 bg-black/30 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-all resize-none placeholder:text-slate-600 leading-relaxed custom-scrollbar" />
+            <label className="text-xs font-bold text-blue-300 uppercase tracking-wider">Words</label>
+            <p className="text-[10px] text-slate-400 pb-1">Separate words with commas</p>
+            <textarea value={customForm.wordsText} onChange={(e) => setCustomForm({ ...customForm, wordsText: e.target.value })} placeholder="Iron Man, Thor, Hulk, Spider-Man..."
+              className="w-full h-40 bg-black/30 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-all resize-none placeholder:text-slate-600 leading-relaxed" />
           </div>
         </div>
       </div>
-      <button onClick={handleCreateCustomCategory}
-        className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] mt-auto mb-8 flex items-center justify-center space-x-2 transition-all shrink-0">
+      <button onClick={handleCreateCustomCategory} className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg mt-auto mb-8 flex items-center justify-center space-x-2 transition-all shrink-0">
         <Check size={20} /><span>Save Category</span>
       </button>
     </div>
@@ -575,40 +419,38 @@ export default function App() {
     const isImposter = gameState.imposterIds.includes(currentPlayer.id);
     return (
       <div className="h-full flex flex-col items-center justify-center p-4 animate-in fade-in duration-300 relative z-10">
-        <div className="w-full max-w-sm glass-card rounded-[2rem] p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden border border-slate-700/50">
+        <div className="w-full max-w-sm glass-card rounded-[2rem] p-6 text-center shadow-2xl relative overflow-hidden border border-slate-700/50">
           <div className="absolute -top-20 -right-20 w-48 h-48 bg-blue-500 rounded-full blur-[60px] opacity-10"></div>
-          <h2 className="text-base sm:text-lg text-blue-200/60 font-semibold mb-1 tracking-wide uppercase">Pass phone to</h2>
+          <h2 className="text-base text-blue-200/60 font-semibold mb-1 tracking-wide uppercase">Pass phone to</h2>
           <div className="text-5xl mb-2">{currentPlayer.emoji}</div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white mb-8 sm:mb-10 drop-shadow-md">{currentPlayer.name}</h1>
+          <h1 className="text-3xl font-black text-white mb-8 drop-shadow-md">{currentPlayer.name}</h1>
           {!gameState.roleRevealed ? (
             <button onClick={() => setGameState(prev => ({ ...prev, roleRevealed: true }))}
-              className="w-full py-12 sm:py-14 bg-black/40 hover:bg-black/60 active:scale-95 rounded-2xl border-2 border-dashed border-slate-600 hover:border-blue-400 flex flex-col items-center justify-center space-y-4 transition-all group shadow-inner">
+              className="w-full py-12 bg-black/40 hover:bg-black/60 active:scale-95 rounded-2xl border-2 border-dashed border-slate-600 hover:border-blue-400 flex flex-col items-center justify-center space-y-4 transition-all group shadow-inner">
               <Eye size={48} className="text-slate-500 group-hover:text-blue-400 transition-colors" />
-              <span className="text-white font-bold text-lg sm:text-xl tracking-wide group-hover:text-blue-100">Tap to Reveal Role</span>
+              <span className="text-white font-bold text-lg tracking-wide">Tap to Reveal Role</span>
             </button>
           ) : (
             <div className="space-y-6 animate-in zoom-in-95 duration-300">
-              <div className={`p-6 sm:p-8 rounded-3xl border backdrop-blur-md shadow-2xl ${isImposter ? 'bg-red-950/60 border-red-500/40' : 'bg-blue-950/60 border-blue-500/40'}`}>
+              <div className={`p-6 rounded-3xl border backdrop-blur-md shadow-2xl ${isImposter ? 'bg-red-950/60 border-red-500/40' : 'bg-blue-950/60 border-blue-500/40'}`}>
                 {isImposter ? (
                   <div className="space-y-4">
-                    <AlertCircle size={40} className="text-red-500 mx-auto mb-2 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]" />
-                    <h3 className="text-xl sm:text-2xl font-black text-red-400 uppercase tracking-widest">Imposter</h3>
+                    <AlertCircle size={40} className="text-red-500 mx-auto mb-2" />
+                    <h3 className="text-xl font-black text-red-400 uppercase tracking-widest">Imposter</h3>
                     <div className="h-px w-16 bg-red-500/30 mx-auto"></div>
-                    <p className="text-red-200/70 text-xs sm:text-sm font-medium">Blend in. The category is:</p>
-                    <div className="text-2xl sm:text-3xl font-black text-white mt-2 tracking-wide break-words">{gameState.category}</div>
+                    <p className="text-red-200/70 text-xs font-medium">Blend in. The category is:</p>
+                    <div className="text-2xl font-black text-white tracking-wide">{gameState.category}</div>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <Search size={40} className="text-blue-400 mx-auto mb-2 drop-shadow-[0_0_15px_rgba(96,165,250,0.4)]" />
-                    <h3 className="text-base sm:text-lg font-bold text-blue-200/70 uppercase tracking-widest">Secret Word</h3>
+                    <Search size={40} className="text-blue-400 mx-auto mb-2" />
+                    <h3 className="text-base font-bold text-blue-200/70 uppercase tracking-widest">Secret Word</h3>
                     <div className="h-px w-16 bg-blue-500/30 mx-auto"></div>
-                    <div className="text-3xl sm:text-4xl font-black text-white tracking-wide break-words">{gameState.secretWord}</div>
+                    <div className="text-3xl font-black text-white tracking-wide">{gameState.secretWord}</div>
                   </div>
                 )}
               </div>
-              <button onClick={nextReveal} className="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">
-                Hide & Next
-              </button>
+              <button onClick={nextReveal} className="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">Hide & Next</button>
             </div>
           )}
         </div>
@@ -622,40 +464,31 @@ export default function App() {
       <div className="h-full flex flex-col animate-in slide-in-from-bottom-4 duration-500 relative z-10">
         <TopBar title="Give Clues" showBack={false} />
         <div className="flex-1 flex flex-col min-h-0">
-          <div className="glass-card rounded-3xl p-5 sm:p-6 text-center mb-4 shadow-lg border border-slate-700/50 relative overflow-hidden shrink-0">
+          <div className="glass-card rounded-3xl p-5 text-center mb-4 border border-slate-700/50 relative overflow-hidden shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
-            <MessageSquare size={32} className="text-purple-400 mx-auto mb-3 sm:mb-4 relative z-10" />
-            <h2 className="text-white font-black text-xl sm:text-2xl mb-2 relative z-10">Time to play!</h2>
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed relative z-10">
-              Take turns saying exactly <strong className="text-purple-300">one word</strong> related to the secret. Imposters must blend in.
-            </p>
+            <MessageSquare size={32} className="text-purple-400 mx-auto mb-3 relative z-10" />
+            <h2 className="text-white font-black text-xl mb-2 relative z-10">Time to play!</h2>
+            <p className="text-slate-300 text-xs leading-relaxed relative z-10">Take turns saying exactly <strong className="text-purple-300">one word</strong> related to the secret.</p>
           </div>
-
-          {/* Active house rules reminder */}
           {activeRules.length > 0 && (
             <div className="mb-4 p-3 rounded-2xl bg-blue-500/5 border border-blue-500/20 shrink-0">
               <p className="text-blue-300 text-[10px] font-bold uppercase tracking-widest mb-1.5">Active Rules</p>
               <div className="flex flex-wrap gap-1.5">
-                {activeRules.map(r => (
-                  <span key={r.id} className="text-[10px] bg-blue-500/10 text-blue-200 border border-blue-500/20 px-2 py-0.5 rounded-full">{r.label}</span>
-                ))}
+                {activeRules.map(r => <span key={r.id} className="text-[10px] bg-blue-500/10 text-blue-200 border border-blue-500/20 px-2 py-0.5 rounded-full">{r.label}</span>)}
               </div>
             </div>
           )}
-
-          <h3 className="text-blue-300 font-bold uppercase tracking-widest text-xs mb-3 px-2 sm:px-4 shrink-0">Turn Order</h3>
+          <h3 className="text-blue-300 font-bold uppercase tracking-widest text-xs mb-3 px-2 shrink-0">Turn Order</h3>
           <div className="glass-card rounded-3xl p-3 space-y-2 mb-6 overflow-y-auto custom-scrollbar flex-1">
             {gameState.shuffledPlayers.map((player, idx) => (
-              <div key={player.id} className="flex items-center p-3 sm:p-4 bg-black/20 rounded-2xl border border-white/5">
-                <div className="w-7 h-7 rounded-full bg-slate-800 text-blue-400 flex items-center justify-center font-bold text-xs mr-3 shrink-0 border border-slate-700">{idx + 1}</div>
+              <div key={player.id} className="flex items-center p-3 bg-black/20 rounded-2xl border border-white/5">
+                <div className="w-7 h-7 rounded-full bg-slate-800 text-blue-400 flex items-center justify-center font-bold text-xs mr-3 border border-slate-700 shrink-0">{idx + 1}</div>
                 <span className="text-xl mr-3">{player.emoji}</span>
-                <span className="text-white font-bold text-base sm:text-lg truncate">{player.name}</span>
+                <span className="text-white font-bold text-base truncate">{player.name}</span>
               </div>
             ))}
           </div>
-
-          <button onClick={() => setScreen('voting')}
-            className="w-full py-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(225,29,72,0.3)] mt-auto mb-8 flex items-center justify-center space-x-2 transition-all shrink-0">
+          <button onClick={() => setScreen('voting')} className="w-full py-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(225,29,72,0.3)] mt-auto mb-8 flex items-center justify-center space-x-2 transition-all shrink-0">
             <AlertCircle size={24} /><span>Ready to Vote</span>
           </button>
         </div>
@@ -667,15 +500,15 @@ export default function App() {
     <div className="h-full flex flex-col animate-in fade-in duration-300 relative z-10">
       <TopBar title="Vote Imposter" showBack={false} />
       <div className="text-center mb-6 bg-blue-900/10 py-3 rounded-2xl border border-blue-500/10 shrink-0">
-        <p className="text-blue-200/80 font-medium text-sm sm:text-base">Discuss. Who will you execute?</p>
+        <p className="text-blue-200/80 font-medium text-sm">Discuss. Who will you execute?</p>
       </div>
       <div className="space-y-3 flex-1 overflow-y-auto pb-8 custom-scrollbar relative">
         {players.map(player => (
           <button key={player.id} onClick={() => setPendingVoteId(player.id)}
-            className="w-full flex items-center justify-between p-4 sm:p-5 glass-card hover:bg-white/10 active:scale-95 rounded-2xl transition-all border border-slate-700/50 group">
+            className="w-full flex items-center justify-between p-4 glass-card hover:bg-white/10 active:scale-95 rounded-2xl transition-all border border-slate-700/50 group">
             <div className="flex items-center space-x-3">
               <span className="text-2xl">{player.emoji}</span>
-              <span className="text-white font-bold text-lg sm:text-xl group-hover:text-blue-200 transition-colors truncate">{player.name}</span>
+              <span className="text-white font-bold text-lg group-hover:text-blue-200 transition-colors truncate">{player.name}</span>
             </div>
             <div className="w-6 h-6 rounded-full border-2 border-slate-500 group-hover:border-blue-400 transition-colors shrink-0"></div>
           </button>
@@ -683,15 +516,13 @@ export default function App() {
       </div>
       {pendingVoteId && (
         <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="glass-card w-full max-w-sm p-6 sm:p-8 rounded-[2rem] text-center shadow-2xl border border-slate-600 animate-in zoom-in-95">
+          <div className="glass-card w-full max-w-sm p-6 rounded-[2rem] text-center shadow-2xl border border-slate-600 animate-in zoom-in-95">
             <div className="text-5xl mb-4">{players.find(p => p.id === pendingVoteId)?.emoji}</div>
-            <h3 className="text-xl sm:text-2xl font-black text-white mb-2 leading-tight">
-              Execute <span className="text-red-400">{players.find(p => p.id === pendingVoteId)?.name}</span>?
-            </h3>
+            <h3 className="text-xl font-black text-white mb-2">Execute <span className="text-red-400">{players.find(p => p.id === pendingVoteId)?.name}</span>?</h3>
             <p className="text-sm text-slate-300 mb-8 px-2">If they are innocent, the imposter will win!</p>
             <div className="flex space-x-3">
               <button onClick={() => setPendingVoteId(null)} className="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">Cancel</button>
-              <button onClick={() => handleVote(pendingVoteId)} className="flex-1 py-3.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all">Confirm</button>
+              <button onClick={() => handleVote(pendingVoteId)} className="flex-1 py-3.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold transition-all">Confirm</button>
             </div>
           </div>
         </div>
@@ -702,57 +533,35 @@ export default function App() {
   const renderResult = () => {
     const isImposterCaught = gameState.winner === 'players';
     const imposters = players.filter(p => gameState.imposterIds.includes(p.id));
-    const imposterText = imposters.length > 1 ? 'The Imposters were' : 'The Imposter was';
-    const namesString = imposters.map(p => `${p.emoji} ${p.name}`).join(' & ');
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-
     return (
       <div className="h-full flex flex-col animate-in zoom-in-95 duration-500 text-center relative z-10 overflow-y-auto custom-scrollbar py-6 px-1">
-        {/* Share toast */}
         {shareToast && (
-          <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-600 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl animate-in fade-in slide-in-from-top-2 flex items-center space-x-2">
+          <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-600 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl animate-in fade-in flex items-center space-x-2">
             <Check size={16} className="text-green-400" /><span>Copied to clipboard!</span>
           </div>
         )}
-
         <div className="space-y-6 shrink-0">
           <div className="inline-block relative mx-auto">
             <div className={`absolute inset-0 blur-[50px] opacity-30 rounded-full ${isImposterCaught ? 'bg-blue-500' : 'bg-red-500'}`}></div>
-            <div className={`relative p-6 sm:p-8 rounded-full ${isImposterCaught ? 'bg-blue-500/10 border-blue-500/30' : 'bg-red-500/10 border-red-500/30'} border`}>
-              {isImposterCaught
-                ? <Search size={64} className="text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]" />
-                : <AlertCircle size={64} className="text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />}
+            <div className={`relative p-6 rounded-full border ${isImposterCaught ? 'bg-blue-500/10 border-blue-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+              {isImposterCaught ? <Search size={64} className="text-blue-400" /> : <AlertCircle size={64} className="text-red-500" />}
             </div>
           </div>
           <div>
-            <h1 className={`text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 ${isImposterCaught ? 'text-blue-400' : 'text-red-500'}`}>
-              {isImposterCaught ? 'Caught!' : 'Escaped!'}
-            </h1>
-            <p className="text-base sm:text-lg text-blue-200/80 mt-4">{imposterText}</p>
-            <p className="font-black text-xl sm:text-2xl text-white mt-1 break-words px-4">{namesString}</p>
+            <h1 className={`text-4xl font-black uppercase tracking-tight mb-2 ${isImposterCaught ? 'text-blue-400' : 'text-red-500'}`}>{isImposterCaught ? 'Caught!' : 'Escaped!'}</h1>
+            <p className="text-base text-blue-200/80 mt-4">{imposters.length > 1 ? 'The Imposters were' : 'The Imposter was'}</p>
+            <p className="font-black text-xl text-white mt-1 break-words px-4">{imposters.map(p => `${p.emoji} ${p.name}`).join(' & ')}</p>
           </div>
         </div>
-
-        {/* Word reveal */}
-        <div className="glass-card rounded-3xl p-5 sm:p-6 mt-6 space-y-4 border border-slate-700/50 shadow-2xl shrink-0">
+        <div className="glass-card rounded-3xl p-5 mt-6 border border-slate-700/50 shrink-0">
           <div className="flex justify-between">
-            <div>
-              <p className="text-blue-300 text-[10px] uppercase tracking-widest font-bold mb-1">Category</p>
-              <p className="text-white text-base font-medium">{gameState.category}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-blue-300 text-[10px] uppercase tracking-widest font-bold mb-1">Secret Word</p>
-              <p className="text-white text-xl font-black">{gameState.secretWord}</p>
-            </div>
+            <div><p className="text-blue-300 text-[10px] uppercase tracking-widest font-bold mb-1">Category</p><p className="text-white text-base font-medium">{gameState.category}</p></div>
+            <div className="text-right"><p className="text-blue-300 text-[10px] uppercase tracking-widest font-bold mb-1">Secret Word</p><p className="text-white text-xl font-black">{gameState.secretWord}</p></div>
           </div>
         </div>
-
-        {/* Scoreboard */}
         <div className="glass-card rounded-3xl p-4 mt-4 border border-amber-500/20 shrink-0">
-          <div className="flex items-center space-x-2 mb-3">
-            <Trophy size={16} className="text-amber-400" />
-            <p className="text-amber-300 text-xs font-bold uppercase tracking-widest">Scoreboard</p>
-          </div>
+          <div className="flex items-center space-x-2 mb-3"><Trophy size={16} className="text-amber-400" /><p className="text-amber-300 text-xs font-bold uppercase tracking-widest">Scoreboard</p></div>
           <div className="space-y-2">
             {sortedPlayers.map((player, idx) => (
               <div key={player.id} className={`flex items-center space-x-3 p-2 rounded-xl ${idx === 0 && player.score > 0 ? 'bg-amber-500/10' : ''}`}>
@@ -763,17 +572,11 @@ export default function App() {
             ))}
           </div>
         </div>
-
-        {/* Action buttons */}
         <div className="flex space-x-3 mt-6 shrink-0 mb-4">
-          <button onClick={handleShare}
-            className="flex-1 py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-bold text-base transition-all flex items-center justify-center space-x-2 border border-slate-600">
+          <button onClick={handleShare} className="flex-1 py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-bold text-base transition-all flex items-center justify-center space-x-2 border border-slate-600">
             <Share2 size={18} /><span>Share</span>
           </button>
-          <button onClick={resetGame}
-            className="flex-1 py-4 bg-white text-slate-900 hover:bg-slate-200 active:scale-95 rounded-2xl font-black text-base shadow-xl transition-all">
-            Play Again
-          </button>
+          <button onClick={resetGame} className="flex-1 py-4 bg-white text-slate-900 hover:bg-slate-200 active:scale-95 rounded-2xl font-black text-base shadow-xl transition-all">Play Again</button>
         </div>
       </div>
     );
