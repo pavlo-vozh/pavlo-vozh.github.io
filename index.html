@@ -38,7 +38,7 @@
             background-color: #050810;
             color: #f1f5f9;
             margin: 0;
-            overflow: hidden; /* Prevent body scrolling */
+            overflow: hidden;
         }
         
         .glass-card {
@@ -55,7 +55,6 @@
             border-radius: 4px;
         }
 
-        /* Screen Transitions */
         .screen-container {
             display: none;
             animation: fadeIn 0.3s ease-out;
@@ -71,7 +70,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Background Gradient Overlay */
         .bg-gradient-overlay {
             position: absolute; 
             inset: 0; 
@@ -101,7 +99,7 @@
                 <h3 class="text-xl sm:text-2xl font-black text-white mb-2 leading-tight">
                     Execute <span id="vote-target-name" class="text-red-400">Player</span>?
                 </h3>
-                <p class="text-sm text-slate-300 mb-8 px-2">If they are innocent, the imposter will win the game!</p>
+                <p class="text-sm text-slate-300 mb-8 px-2">Make sure you caught the right person...</p>
                 <div class="flex space-x-3">
                     <button onclick="closeVoteModal()" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">Cancel</button>
                     <button id="confirm-vote-btn" class="flex-1 py-3.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all">Confirm</button>
@@ -125,7 +123,7 @@
     </div>
 
     <script>
-        // --- Database (Updated 32+ words per category) ---
+        // --- Database ---
         const WORD_DATABASE = {
             'Sports': ['Soccer', 'Basketball', 'Baseball', 'Tennis', 'Golf', 'Rugby', 'Cricket', 'Volleyball', 'Table Tennis', 'Badminton', 'Swimming', 'Boxing', 'MMA', 'Wrestling', 'Hockey', 'Ice Hockey', 'Field Hockey', 'Gymnastics', 'Athletics', 'Track and Field', 'Cycling', 'Surfing', 'Snowboarding', 'Skiing', 'Skateboarding', 'Bowling', 'Archery', 'Fencing', 'Rowing', 'Sailing', 'Weightlifting', 'Martial Arts', 'Judo', 'Karate', 'Taekwondo', 'Water Polo', 'Handball', 'Lacrosse', 'Softball', 'Dodgeball'],
             'Animals': ['Lion', 'Elephant', 'Giraffe', 'Penguin', 'Kangaroo', 'Dolphin', 'Tiger', 'Bear', 'Wolf', 'Eagle', 'Shark', 'Monkey', 'Zebra', 'Rhino', 'Hippo', 'Crocodile', 'Snake', 'Frog', 'Cheetah', 'Panther', 'Gorilla', 'Sloth', 'Bat', 'Owl', 'Koala', 'Panda', 'Camel', 'Fox', 'Deer', 'Moose', 'Rabbit', 'Squirrel', 'Horse', 'Cow', 'Pig', 'Sheep', 'Goat', 'Duck', 'Chicken', 'Turkey'],
@@ -147,13 +145,38 @@
 
         const PUNISHMENTS = [
             "Do 10 pushups right now.",
-            "Let the winner post a status on your phone.",
+            "Let the group post a status on your phone.",
             "Speak in a British accent for the next round.",
             "Take a shot or drink a full glass of water.",
             "Do your best impression of another player.",
             "Sing everything you say for the next 5 minutes.",
             "Give the winner a massage for 1 minute.",
-            "Show the group the last photo in your camera roll."
+            "Show the group the last photo in your camera roll.",
+            "Let the group text one person in your contacts.",
+            "Do a plank for 45 seconds.",
+            "Speak in the 3rd person for the entire next round.",
+            "Wear your shirt inside out for the rest of the game.",
+            "Hold an ice cube in your hand until it melts.",
+            "Do your best dance move for 10 seconds.",
+            "Keep your eyes closed for the entirety of the next round.",
+            "Communicate only in whispers for the next round.",
+            "Stand up during the entire next round.",
+            "You cannot use the words 'I', 'me', or 'my' next round.",
+            "Let the group draw something small on your arm with a pen.",
+            "Eat a spoonful of a condiment chosen by the group."
+        ];
+
+        const WILDCARDS = [
+            "Clues must be exactly 4 letters long.",
+            "Whisper your clue.",
+            "Say your clue twice (e.g., 'hot, hot').",
+            "No eye contact while giving your clue.",
+            "Your clue must be an action word (verb).",
+            "Sing your clue.",
+            "Clues must start with a vowel.",
+            "Clues must end with a vowel.",
+            "Talk like a robot while giving your clue.",
+            "Clues must be exactly 5 letters long."
         ];
 
         // --- State ---
@@ -162,29 +185,38 @@
             players: [
                 { id: 1, name: 'Player 1', score: 0 }, 
                 { id: 2, name: 'Player 2', score: 0 }, 
-                { id: 3, name: 'Player 3', score: 0 }
+                { id: 3, name: 'Player 3', score: 0 },
+                { id: 4, name: 'Player 4', score: 0 },
+                { id: 5, name: 'Player 5', score: 0 }
             ],
             imposterCount: 1,
             customCategories: [],
             customForm: { name: '', wordsText: '', error: '' },
             settings: {
                 blindImposter: false,
-                clueRounds: 2, // Changed default to 2
+                clueRounds: 2,
                 timeLimit: 0,
-                scoreLimit: 3, // Play to 3 points
-                punishments: true
+                scoreLimit: 5,
+                punishments: true,
+                jesterRole: false,
+                wildcardRounds: false
             },
             game: {
                 category: '',
                 secretWord: '',
                 imposterIds: [],
+                jesterId: null,
+                activeWildcard: null,
                 currentPlayerIndex: 0,
                 roleRevealed: false,
                 winner: null, 
                 shuffledPlayers: [],
                 activeTurnIndex: 0,
                 timeLeft: 0,
-                currentPunishment: ''
+                currentPunishment: '',
+                punishedPlayer: null,
+                lastVotedId: null,
+                earnings: {} // Tracks who earned what this round
             },
             pendingVoteId: null
         };
@@ -192,7 +224,15 @@
         let timerInterval = null;
 
         // --- Utilities ---
-        const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+        const shuffle = (arr) => {
+            const newArr = [...arr];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        };
+        
         const getEl = (id) => document.getElementById(id);
 
         function updateIcons() {
@@ -272,7 +312,7 @@
                 { icon: 'settings', title: 'Setup Game', desc: 'Choose players, adjust imposters, and tweak advanced settings.' },
                 { icon: 'eye', title: 'Reveal Words', desc: 'Everyone sees the secret word except the imposter(s).' },
                 { icon: 'message-square', title: 'Give Clues', desc: 'Take turns saying exactly ONE word related to your secret.' },
-                { icon: 'search', title: 'Find the Imposter', desc: "Discuss and vote. If you execute an imposter, players win!" }
+                { icon: 'search', title: 'Find the Imposter', desc: "Discuss and vote. Beware the Jester!" }
             ];
 
             return `
@@ -296,14 +336,14 @@
         function renderSetup() {
             const maxImposters = Math.max(1, state.players.length - 2);
             if (state.imposterCount > maxImposters) state.imposterCount = maxImposters;
+            
+            const canEnableJester = state.players.length >= 5;
 
             return `
                 ${topBar('Setup Game', true, 'goToHome')}
                 
-                <!-- Main Scrollable Content Area -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 flex flex-col space-y-4">
                     
-                    <!-- Player List -->
                     <div class="glass-card rounded-3xl p-4 sm:p-5 flex flex-col shrink-0 min-h-[220px] max-h-[350px]">
                         <div class="flex justify-between items-center mb-4 shrink-0">
                             <span class="text-white font-semibold flex items-center text-base sm:text-lg">
@@ -327,7 +367,7 @@
                                         placeholder="Player ${index + 1}">
                                     
                                     <div class="flex items-center space-x-2">
-                                        <span class="text-xs font-bold text-slate-500 w-12 text-center bg-black/30 py-1 rounded-md">
+                                        <span class="text-xs font-bold ${player.score < 0 ? 'text-red-400' : 'text-slate-500'} w-12 text-center bg-black/30 py-1 rounded-md">
                                             ${player.score} pts
                                         </span>
                                         ${state.players.length > 3 ? `
@@ -341,9 +381,7 @@
                         </div>
                     </div>
 
-                    <!-- Settings Block -->
                     <div class="space-y-3 shrink-0">
-                        <!-- Imposters Setup -->
                         <div class="glass-card rounded-2xl p-4 flex justify-between items-center border-blue-500/20">
                             <div class="flex items-center space-x-2">
                                 <i data-lucide="alert-circle" class="w-5 h-5 text-red-400"></i>
@@ -360,14 +398,13 @@
                             </div>
                         </div>
 
-                        <!-- Score Limit Setting -->
                         <div class="glass-card rounded-2xl p-4 flex justify-between items-center border-amber-500/20">
                             <div class="flex items-center space-x-2">
                                 <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
                                 <span class="text-white font-semibold">Play To (Wins)</span>
                             </div>
                             <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                                ${[1, 3, 5].map(num => `
+                                ${[3, 5, 10].map(num => `
                                     <button onclick="updateSetting('scoreLimit', ${num})" class="w-10 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.scoreLimit === num ? 'bg-amber-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
                                         ${num}
                                     </button>
@@ -375,14 +412,12 @@
                             </div>
                         </div>
 
-                        <!-- Advanced Settings -->
                         <div class="glass-card rounded-2xl p-4 space-y-5 border-blue-500/20">
                             <div class="flex items-center space-x-2 border-b border-slate-700/50 pb-2">
                                 <i data-lucide="settings-2" class="w-4 h-4 text-purple-400"></i>
                                 <span class="text-white font-semibold text-sm uppercase tracking-wide">Advanced Settings</span>
                             </div>
                             
-                            <!-- Blind Mode -->
                             <div class="flex items-center justify-between group">
                                 <div class="flex items-center space-x-2">
                                     <i data-lucide="eye-off" class="w-4 h-4 ${state.settings.blindImposter ? 'text-purple-400' : 'text-slate-500'}"></i>
@@ -396,7 +431,6 @@
                                 </button>
                             </div>
 
-                            <!-- Punishments Mode -->
                             <div class="flex items-center justify-between group">
                                 <div class="flex items-center space-x-2">
                                     <i data-lucide="flame" class="w-4 h-4 ${state.settings.punishments ? 'text-orange-400' : 'text-slate-500'}"></i>
@@ -410,8 +444,36 @@
                                 </button>
                             </div>
 
-                            <!-- Clue Rounds -->
-                            <div class="flex flex-col space-y-2">
+                            <div class="flex items-center justify-between group">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="sparkles" class="w-4 h-4 ${state.settings.wildcardRounds ? 'text-emerald-400' : 'text-slate-500'}"></i>
+                                    <div>
+                                        <span class="text-slate-200 text-sm font-medium block">Wildcard Rounds</span>
+                                        <span class="text-slate-500 text-[10px] block">Random goofy rule each game</span>
+                                    </div>
+                                </div>
+                                <button onclick="toggleSetting('wildcardRounds')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.wildcardRounds ? 'bg-emerald-600' : 'bg-slate-700'}">
+                                    <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.wildcardRounds ? 'translate-x-6' : 'translate-x-0'}"></div>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center justify-between group ${!canEnableJester ? 'opacity-50' : ''}">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="smile" class="w-4 h-4 ${state.settings.jesterRole && canEnableJester ? 'text-fuchsia-400' : 'text-slate-500'}"></i>
+                                    <div>
+                                        <span class="text-slate-200 text-sm font-medium flex items-center">
+                                            Jester Role
+                                            ${!canEnableJester ? '<i data-lucide="lock" class="w-3 h-3 ml-1 text-slate-500"></i>' : ''}
+                                        </span>
+                                        <span class="text-slate-500 text-[10px] block">${!canEnableJester ? 'Requires 5+ players' : 'Act suspicious. Get voted to win.'}</span>
+                                    </div>
+                                </div>
+                                <button onclick="${canEnableJester ? "toggleSetting('jesterRole')" : ""}" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.jesterRole && canEnableJester ? 'bg-fuchsia-600' : 'bg-slate-700'} ${!canEnableJester ? 'cursor-not-allowed' : ''}">
+                                    <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.jesterRole && canEnableJester ? 'translate-x-6' : 'translate-x-0'}"></div>
+                                </button>
+                            </div>
+
+                            <div class="flex flex-col space-y-2 pt-2 border-t border-slate-700/50">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-2">
                                         <i data-lucide="rotate-ccw" class="w-4 h-4 text-blue-400"></i>
@@ -427,7 +489,6 @@
                                 </div>
                             </div>
 
-                            <!-- Timer -->
                             <div class="flex flex-col space-y-2">
                                 <div class="flex items-center space-x-2">
                                     <i data-lucide="timer" class="w-4 h-4 text-amber-400"></i>
@@ -445,7 +506,6 @@
                     </div>
                 </div>
 
-                <!-- Bottom Fixed Action Button -->
                 <div class="shrink-0 mt-2">
                     <button onclick="setScreen('categories')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex justify-center items-center">
                         Choose Category <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
@@ -544,7 +604,6 @@
                     </div>
                 </div>
                 
-                <!-- Bottom Fixed Action Button -->
                 <div class="shrink-0 mt-2">
                     <button onclick="saveCustomCategory()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center space-x-2 transition-all">
                         <i data-lucide="check" class="w-5 h-5"></i>
@@ -557,6 +616,7 @@
         function renderReveal() {
             const currentPlayer = state.players[state.game.currentPlayerIndex];
             const isImposter = state.game.imposterIds.includes(currentPlayer.id);
+            const isJester = state.game.jesterId === currentPlayer.id;
             const displayName = currentPlayer.name.trim() || `Player ${state.game.currentPlayerIndex + 1}`;
 
             let cardContent = '';
@@ -568,7 +628,20 @@
                     </button>
                 `;
             } else {
-                if (isImposter) {
+                if (isJester) {
+                    cardContent = `
+                        <div class="p-6 sm:p-8 rounded-3xl border backdrop-blur-md shadow-2xl bg-fuchsia-950/60 border-fuchsia-500/40 mb-6">
+                            <i data-lucide="smile" class="w-10 h-10 text-fuchsia-400 mx-auto mb-2 drop-shadow-[0_0_15px_rgba(217,70,239,0.4)] animate-pulse"></i>
+                            <h3 class="text-xl sm:text-2xl font-black text-fuchsia-400 uppercase tracking-widest drop-shadow-sm">The Jester</h3>
+                            <div class="h-px w-16 bg-fuchsia-500/30 mx-auto my-4"></div>
+                            <div>
+                                <p class="text-fuchsia-200/70 text-xs sm:text-sm font-medium">Your goal is different:</p>
+                                <div class="text-lg sm:text-xl font-bold text-white mt-3 leading-tight">Act suspicious and get voted out to win the round!</div>
+                            </div>
+                        </div>
+                        <button onclick="nextReveal()" class="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">Hide & Next</button>
+                    `;
+                } else if (isImposter) {
                     cardContent = `
                         <div class="p-6 sm:p-8 rounded-3xl border backdrop-blur-md shadow-2xl bg-red-950/60 border-red-500/40 mb-6">
                             <i data-lucide="${state.settings.blindImposter ? 'eye-off' : 'alert-circle'}" class="w-10 h-10 text-red-500 mx-auto mb-2 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)] ${state.settings.blindImposter ? 'animate-pulse' : ''}"></i>
@@ -660,16 +733,27 @@
             return `
                 ${topBar('Give Clues', false)}
                 <div class="flex-1 flex flex-col min-h-0 space-y-4 pb-4">
-                    <div class="glass-card rounded-2xl p-4 text-center shrink-0 border border-slate-700/50 flex justify-between items-center bg-indigo-900/10">
-                        <div class="text-left">
-                            <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Phase</span>
-                            <span class="text-white font-medium text-sm">Say 1 word</span>
+                    
+                    ${state.game.activeWildcard ? `
+                        <div class="glass-card rounded-2xl p-4 text-center shrink-0 border border-emerald-500/30 bg-emerald-950/20 shadow-lg flex flex-col items-center justify-center">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400 animate-pulse"></i>
+                                <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Wildcard Rule</span>
+                            </div>
+                            <span class="text-white font-medium text-sm px-2">${state.game.activeWildcard}</span>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Round</span>
-                            <span class="text-white font-medium text-sm">${currentRound} of ${state.settings.clueRounds}</span>
+                    ` : `
+                        <div class="glass-card rounded-2xl p-4 text-center shrink-0 border border-slate-700/50 flex justify-between items-center bg-indigo-900/10">
+                            <div class="text-left">
+                                <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Phase</span>
+                                <span class="text-white font-medium text-sm">Say 1 word</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Round</span>
+                                <span class="text-white font-medium text-sm">${currentRound} of ${state.settings.clueRounds}</span>
+                            </div>
                         </div>
-                    </div>
+                    `}
 
                     <div id="playing-dashboard" class="glass-card rounded-[2rem] p-6 sm:p-8 text-center border relative overflow-hidden flex-1 flex flex-col justify-center shadow-xl transition-colors duration-300 ${bgClass}">
                         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
@@ -679,7 +763,6 @@
                     </div>
                 </div>
 
-                <!-- Bottom Fixed Action Button -->
                 <div class="shrink-0 mt-2">
                     <button onclick="advanceTurn()" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center transition-all">
                         Next Player
@@ -707,12 +790,95 @@
 
         function renderResult() {
             const isPlayersWin = state.game.winner === 'players';
+            const isJesterWin = state.game.winner === 'jester';
+            const isImposterWin = state.game.winner === 'imposter';
+            
             const imposters = state.players.filter(p => state.game.imposterIds.includes(p.id));
             const imposterNames = imposters.map(p => p.name.trim() || 'Player').join(' & ');
             
+            const suspect = state.players.find(p => p.id === state.game.lastVotedId);
+            const suspectName = suspect ? (suspect.name.trim() || 'Player') : 'Someone';
+            
+            let headerHTML = '';
+            
+            if (isJesterWin) {
+                headerHTML = `
+                    <div class="space-y-4 text-center pt-8">
+                        <div class="inline-block relative group">
+                            <div class="absolute inset-0 blur-[50px] opacity-40 rounded-full bg-fuchsia-500"></div>
+                            <div class="relative p-6 sm:p-8 rounded-full bg-fuchsia-500/20 border-fuchsia-500/50 border-2">
+                                <i data-lucide="smile" class="w-16 h-16 sm:w-20 sm:h-20 text-fuchsia-400 drop-shadow-[0_0_15px_rgba(217,70,239,0.5)]"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 text-fuchsia-400 drop-shadow-lg">Jester Wins!</h1>
+                            <p class="text-base sm:text-lg text-fuchsia-200/90 mt-2 font-medium">You fools executed <span class="text-white font-bold">${suspectName}</span>!</p>
+                        </div>
+                    </div>
+                `;
+            } else if (isPlayersWin) {
+                headerHTML = `
+                    <div class="space-y-4 text-center pt-8">
+                        <div class="inline-block relative group">
+                            <div class="absolute inset-0 blur-[50px] opacity-40 rounded-full bg-blue-500"></div>
+                            <div class="relative p-6 sm:p-8 rounded-full bg-blue-500/20 border-blue-500/50 border-2">
+                                <i data-lucide="trophy" class="w-16 h-16 sm:w-20 sm:h-20 text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 text-blue-400 drop-shadow-lg">Imposter Caught!</h1>
+                            <p class="text-base sm:text-lg text-blue-200/90 mt-2 font-medium">The crew successfully executed <span class="text-white font-bold">${suspectName}</span>.</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                headerHTML = `
+                    <div class="space-y-4 text-center pt-8">
+                        <div class="inline-block relative group">
+                            <div class="absolute inset-0 blur-[50px] opacity-40 rounded-full bg-red-500"></div>
+                            <div class="relative p-6 sm:p-8 rounded-full bg-red-500/20 border-red-500/50 border-2">
+                                <i data-lucide="alert-circle" class="w-16 h-16 sm:w-20 sm:h-20 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 text-red-500 drop-shadow-lg">Imposter Escaped!</h1>
+                            <p class="text-base sm:text-lg text-red-200/90 mt-2 font-medium">You executed <span class="text-white font-bold">${suspectName}</span> (Innocent).</p>
+                            <p class="text-sm font-bold text-red-400 mt-2">The Imposter was <span class="text-white text-lg">${imposterNames}</span></p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Build the detailed earnings list and explicitly order by highest points gained
+            const sortedPlayers = [...state.players].sort((a,b) => (state.game.earnings[b.id] || 0) - (state.game.earnings[a.id] || 0));
+            
+            const earningsHTML = sortedPlayers.map(p => {
+                const earned = state.game.earnings[p.id] || 0;
+                let colorClass = 'text-slate-400';
+                let sign = '';
+                if (earned > 0) { colorClass = 'text-emerald-400'; sign = '+'; }
+                if (earned < 0) { colorClass = 'text-red-400'; }
+                
+                let roleTag = '';
+                if (state.game.imposterIds.includes(p.id)) {
+                    roleTag = '<span class="text-[10px] ml-2 px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 uppercase tracking-wider font-bold">Imposter</span>';
+                } else if (state.game.jesterId === p.id) {
+                    roleTag = '<span class="text-[10px] ml-2 px-1.5 py-0.5 rounded bg-fuchsia-500/20 text-fuchsia-400 border border-fuchsia-500/30 uppercase tracking-wider font-bold">Jester</span>';
+                }
+
+                return `
+                    <div class="flex justify-between items-center bg-black/20 rounded-lg p-2.5 px-3">
+                        <div class="flex items-center">
+                            <span class="text-white text-sm font-medium">${p.name}</span>
+                            ${roleTag}
+                        </div>
+                        <span class="${colorClass} font-black text-sm w-8 text-right">${sign}${earned}</span>
+                    </div>
+                `;
+            }).join('');
+
             let punishmentHTML = '';
-            if (state.settings.punishments && state.game.currentPunishment) {
-                const loserNames = isPlayersWin ? imposterNames : state.players.filter(p => !state.game.imposterIds.includes(p.id)).map(p=>p.name).join(', ');
+            if (state.settings.punishments && state.game.currentPunishment && state.game.punishedPlayer) {
                 punishmentHTML = `
                     <div class="glass-card rounded-2xl p-4 mt-4 border border-orange-500/30 bg-orange-950/20 shadow-lg w-full max-w-sm shrink-0">
                         <div class="flex items-center space-x-2 justify-center mb-2">
@@ -720,38 +886,37 @@
                             <span class="text-orange-300 font-bold uppercase text-xs tracking-widest">Punishment Time</span>
                         </div>
                         <p class="text-white text-center font-medium leading-tight px-2 text-sm">
-                            <span class="text-orange-400 font-bold">${isPlayersWin ? 'Imposters' : 'Players'}</span>: ${state.game.currentPunishment}
+                            <span class="text-orange-400 font-bold">${state.game.punishedPlayer}</span>: ${state.game.currentPunishment}
                         </p>
                     </div>
                 `;
             }
 
+            const champion = state.players.find(p => p.score >= state.settings.scoreLimit);
+            const primaryBtnAction = champion ? 'showSeriesWinner()' : 'playNextRound()';
+            const primaryBtnText = champion ? 'View Champion' : 'Next Round';
+            const primaryBtnClass = champion ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-white text-slate-900 hover:bg-slate-200';
+
             return `
                 <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center py-4 space-y-6 sm:space-y-8 relative z-10">
                     
-                    <!-- Score Header -->
                     <div class="absolute top-0 right-0 sm:right-4 glass-card px-3 py-1.5 rounded-full border border-slate-700/50 flex space-x-3 items-center">
                         <i data-lucide="list-ordered" class="w-4 h-4 text-slate-400"></i>
                         <span class="text-xs font-bold text-slate-300">Target: ${state.settings.scoreLimit} Wins</span>
                     </div>
 
-                    <div class="space-y-4 text-center pt-8">
-                        <div class="inline-block relative group">
-                            <div class="absolute inset-0 blur-[50px] opacity-30 rounded-full ${isPlayersWin ? 'bg-blue-500' : 'bg-red-500'}"></div>
-                            <div class="relative p-6 sm:p-8 rounded-full ${isPlayersWin ? 'bg-blue-500/10 border-blue-500/30' : 'bg-red-500/10 border-red-500/30'} border">
-                                <i data-lucide="${isPlayersWin ? 'trophy' : 'alert-circle'}" class="w-16 h-16 sm:w-20 sm:h-20 ${isPlayersWin ? 'text-blue-400' : 'text-red-500'} drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <h1 class="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 ${isPlayersWin ? 'text-blue-400' : 'text-red-500'}">
-                                ${isPlayersWin ? 'Caught!' : 'Escaped!'}
-                            </h1>
-                            <p class="text-base sm:text-lg text-blue-200/80 mt-2">${imposters.length > 1 ? 'The Imposters were' : 'The Imposter was'}</p>
-                            <p class="font-black text-xl sm:text-2xl text-white break-words px-4">${imposterNames}</p>
+                    ${headerHTML}
+
+                    <!-- Explicit Breakdown per Player -->
+                    <div class="w-full max-w-sm glass-card rounded-2xl p-4 border border-slate-700/50 shrink-0">
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3 text-left">Round Points</p>
+                        <div class="space-y-1.5">
+                            ${earningsHTML}
                         </div>
                     </div>
 
-                    <div class="glass-card rounded-3xl p-6 sm:p-8 w-full max-w-sm space-y-5 border border-slate-700/50 shadow-2xl relative overflow-hidden shrink-0">
+                    <!-- Only show the secret word if Jester DID NOT win, or show it anyway but smaller -->
+                    <div class="glass-card rounded-3xl p-6 sm:p-8 w-full max-w-sm space-y-5 border border-slate-700/50 shadow-2xl relative overflow-hidden shrink-0 ${isJesterWin ? 'opacity-70' : ''}">
                         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-slate-500/30 to-transparent"></div>
                         <div class="text-center">
                             <p class="text-blue-300 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">Category</p>
@@ -766,17 +931,17 @@
 
                     ${punishmentHTML}
 
-                    <!-- Current Standings -->
+                    <!-- Total Overall Leaderboard -->
                     <div class="w-full max-w-sm glass-card rounded-2xl p-4 border border-slate-700/50 shrink-0">
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3 text-left">Leaderboard</p>
-                        <div class="space-y-2">
-                            ${[...state.players].sort((a,b)=>b.score - a.score).slice(0,3).map((p, i) => `
-                                <div class="flex justify-between items-center bg-black/20 rounded-lg p-2 px-3">
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3 text-left">Total Leaderboard</p>
+                        <div class="space-y-1.5">
+                            ${[...state.players].sort((a,b)=>b.score - a.score).map((p, i) => `
+                                <div class="flex justify-between items-center bg-black/20 rounded-lg p-2.5 px-3">
                                     <div class="flex items-center space-x-2">
                                         <span class="text-slate-500 text-xs font-bold w-4">${i+1}.</span>
                                         <span class="text-white text-sm font-medium">${p.name}</span>
                                     </div>
-                                    <span class="text-blue-400 font-bold text-sm">${p.score} pt${p.score !== 1 ? 's' : ''}</span>
+                                    <span class="${p.score < 0 ? 'text-red-400' : 'text-blue-400'} font-bold text-sm">${p.score} pt${p.score !== 1 && p.score !== -1 ? 's' : ''}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -786,7 +951,7 @@
                 <!-- Bottom Fixed Action Buttons -->
                 <div class="shrink-0 mt-4 flex w-full max-w-sm mx-auto space-x-3">
                     <button onclick="setScreen('setup')" class="flex-1 py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-bold transition-all">Setup</button>
-                    <button onclick="playNextRound()" class="flex-[2] py-4 bg-white text-slate-900 hover:bg-slate-200 active:scale-95 rounded-2xl font-black text-lg shadow-xl transition-all">Next Round</button>
+                    <button onclick="${primaryBtnAction}" class="flex-[2] py-4 ${primaryBtnClass} active:scale-95 rounded-2xl font-black text-lg shadow-xl transition-all flex items-center justify-center">${primaryBtnText}</button>
                 </div>
             `;
         }
@@ -811,6 +976,9 @@
         function removePlayer(id) {
             if (state.players.length > 3) {
                 state.players = state.players.filter(p => p.id !== id);
+                if (state.players.length < 5) {
+                    state.settings.jesterRole = false;
+                }
                 render();
             }
         }
@@ -870,21 +1038,38 @@
             if (!words || words.length === 0) return;
 
             const randomWord = words[Math.floor(Math.random() * words.length)];
-            const shuffledForImposters = shuffle(state.players);
-            const imposterIds = shuffledForImposters.slice(0, state.imposterCount).map(p => p.id);
+            
+            const shuffledForRoles = shuffle(state.players);
+            const imposterIds = shuffledForRoles.slice(0, state.imposterCount).map(p => p.id);
+            
+            let jesterId = null;
+            if (state.settings.jesterRole && state.players.length >= 5) {
+                jesterId = shuffledForRoles[state.imposterCount].id; 
+            }
+
+            let activeWildcard = null;
+            if (state.settings.wildcardRounds) {
+                activeWildcard = WILDCARDS[Math.floor(Math.random() * WILDCARDS.length)];
+            }
+
             const shuffledTurnOrder = shuffle(state.players);
 
             state.game = {
                 category: categoryName,
                 secretWord: randomWord,
                 imposterIds: imposterIds,
+                jesterId: jesterId,
+                activeWildcard: activeWildcard,
                 currentPlayerIndex: 0,
                 roleRevealed: false,
                 winner: null,
                 shuffledPlayers: shuffledTurnOrder,
                 activeTurnIndex: 0,
                 timeLeft: state.settings.timeLimit,
-                currentPunishment: ''
+                currentPunishment: '',
+                punishedPlayer: null,
+                lastVotedId: null,
+                earnings: {}
             };
             setScreen('reveal');
         }
@@ -923,38 +1108,84 @@
         }
 
         function closeVoteModal() {
-            state.pendingVoteId = null;
             getEl('vote-modal').classList.add('hidden');
             getEl('vote-modal').classList.remove('flex');
         }
 
         function confirmVote() {
-            closeVoteModal();
             const suspectId = state.pendingVoteId;
+            closeVoteModal();
+            state.pendingVoteId = null; 
             
-            if (state.game.imposterIds.includes(suspectId)) {
-                state.game.winner = 'players';
-                // Award points to players
+            state.game.lastVotedId = suspectId;
+            state.game.earnings = {};
+            
+            if (state.game.jesterId === suspectId) {
+                // Jester Wins
+                state.game.winner = 'jester';
                 state.players.forEach(p => {
-                    if (!state.game.imposterIds.includes(p.id)) p.score += 1;
+                    if (p.id === suspectId) {
+                        p.score += 2; 
+                        state.game.earnings[p.id] = 2;
+                    } else {
+                        state.game.earnings[p.id] = 0;
+                    }
+                });
+            } else if (state.game.imposterIds.includes(suspectId)) {
+                // Players Win (Caught an imposter)
+                state.game.winner = 'players';
+                state.players.forEach(p => {
+                    if (state.game.imposterIds.includes(p.id)) {
+                        p.score -= 1; // ALL Imposters lose 1 point if the team is caught
+                        state.game.earnings[p.id] = -1;
+                    } else if (p.id !== state.game.jesterId) {
+                        p.score += 1; // Crewmates gain 1 point
+                        state.game.earnings[p.id] = 1;
+                    } else {
+                        state.game.earnings[p.id] = 0; // Jester gets 0
+                    }
                 });
             } else {
+                // Imposter Wins (Innocent player voted out)
                 state.game.winner = 'imposter';
-                // Award points to imposters
                 state.players.forEach(p => {
-                    if (state.game.imposterIds.includes(p.id)) p.score += 2;
+                    if (state.game.imposterIds.includes(p.id)) {
+                        p.score += 2; // Imposters rewarded
+                        state.game.earnings[p.id] = 2;
+                    } else if (p.id === suspectId) {
+                        p.score -= 1; // Executed innocent loses 1
+                        state.game.earnings[p.id] = -1;
+                    } else {
+                        state.game.earnings[p.id] = 0; // Other innocent players get 0
+                    }
                 });
             }
 
             if (state.settings.punishments) {
                 state.game.currentPunishment = PUNISHMENTS[Math.floor(Math.random() * PUNISHMENTS.length)];
+                
+                let loserPool = [];
+                if (state.game.winner === 'jester') {
+                    // Jester won. Punish an innocent.
+                    loserPool = state.players.filter(p => p.id !== state.game.jesterId && !state.game.imposterIds.includes(p.id));
+                } else if (state.game.winner === 'players') {
+                    // Players won. Punish an imposter.
+                    loserPool = state.players.filter(p => state.game.imposterIds.includes(p.id));
+                } else {
+                    // Imposter won. Punish an innocent.
+                    loserPool = state.players.filter(p => !state.game.imposterIds.includes(p.id) && p.id !== state.game.jesterId);
+                }
+                
+                if (loserPool.length === 0) loserPool = state.players; 
+                
+                const punished = loserPool[Math.floor(Math.random() * loserPool.length)];
+                state.game.punishedPlayer = punished.name.trim() || 'Someone';
             }
 
             setScreen('result');
-            checkSeriesWinner();
         }
 
-        function checkSeriesWinner() {
+        function showSeriesWinner() {
             const champion = state.players.find(p => p.score >= state.settings.scoreLimit);
             if (champion) {
                 getEl('champion-name').innerText = champion.name;
@@ -965,7 +1196,6 @@
         }
 
         function playNextRound() {
-            // Keep scores, go to categories to pick new word
             setScreen('categories');
         }
 
@@ -1028,7 +1258,7 @@
                 conf.style.position = 'absolute';
                 conf.style.width = '10px';
                 conf.style.height = '10px';
-                conf.style.backgroundColor = ['#f59e0b', '#3b82f6', '#ef4444', '#10b981', '#a855f7'][Math.floor(Math.random()*5)];
+                conf.style.backgroundColor = ['#f59e0b', '#3b82f6', '#ef4444', '#10b981', '#a855f7', '#d946ef'][Math.floor(Math.random()*6)];
                 conf.style.left = '50%';
                 conf.style.top = '50%';
                 conf.style.transform = `translate(-50%, -50%) rotate(${Math.random()*360}deg)`;
@@ -1055,6 +1285,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
