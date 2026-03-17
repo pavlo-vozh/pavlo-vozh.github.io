@@ -4,101 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Imposter Game</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Tailwind Config for Custom Animations/Colors -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    animation: {
-                        'pulse-fast': 'pulse-fast 0.5s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        'pulse-fast': {
-                            '0%, 100%': { transform: 'scale(1)', opacity: '1' },
-                            '50%': { transform: 'scale(1.05)', opacity: '0.8' },
-                        }
-                    }
+                    animation: { 'pulse-fast': 'pulse-fast 0.5s ease-in-out infinite' },
+                    keyframes: { 'pulse-fast': { '0%, 100%': { transform: 'scale(1)', opacity: '1' }, '50%': { transform: 'scale(1.05)', opacity: '0.8' } } }
                 }
             }
         }
     </script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #050810;
-            color: #f1f5f9;
-            margin: 0;
-            overflow: hidden;
-        }
-        
-        .glass-card {
-            background: rgba(26, 31, 46, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
+        body { font-family: 'Inter', sans-serif; background-color: #050810; color: #f1f5f9; margin: 0; overflow: hidden; }
+        .glass-card { background: rgba(26,31,46,0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.3);
-            border-radius: 4px;
-        }
-
-        .screen-container {
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-            height: 100%;
-            flex-direction: column;
-            position: relative;
-            z-index: 10;
-        }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 4px; }
+        .screen-container { display: none; animation: fadeIn 0.3s ease-out; height: 100%; flex-direction: column; position: relative; z-index: 10; }
         .screen-container.active { display: flex; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .bg-gradient-overlay {
-            position: absolute; 
-            inset: 0; 
-            pointer-events: none; 
-            z-index: 0;
-            background: linear-gradient(to bottom, rgba(30, 58, 138, 0.1), transparent, rgba(0, 0, 0, 0.6));
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .bg-gradient-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 0; background: linear-gradient(to bottom, rgba(30,58,138,0.1), transparent, rgba(0,0,0,0.6)); }
+        .cat-checkbox { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; border: 2px solid #475569; border-radius: 6px; cursor: pointer; transition: all 0.15s; flex-shrink: 0; position: relative; }
+        .cat-checkbox:checked { background: #3b82f6; border-color: #3b82f6; }
+        .cat-checkbox:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 8px; height: 12px; border: 2px solid white; border-top: none; border-left: none; transform: rotate(45deg); }
     </style>
 </head>
 <body class="min-h-[100dvh] flex items-center justify-center selection:bg-blue-500/30 p-0 sm:p-4">
 
-    <!-- Mobile Constraint Wrapper -->
     <div class="w-full h-[100dvh] sm:h-full sm:max-h-[850px] sm:max-w-[400px] bg-[#090E17] relative sm:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col sm:border sm:border-slate-700/50 ring-0 sm:ring-8 sm:ring-black/50">
-        
         <div class="bg-gradient-overlay"></div>
+        <div id="app-root" class="relative z-10 flex-1 flex flex-col px-5 sm:px-6 h-full overflow-hidden pb-4 sm:pb-6"></div>
 
-        <div id="app-root" class="relative z-10 flex-1 flex flex-col px-5 sm:px-6 h-full overflow-hidden pb-4 sm:pb-6">
-            <!-- Content injected here -->
-        </div>
-
-        <!-- Global Modal for Voting -->
+        <!-- Vote Modal -->
         <div id="vote-modal" class="hidden absolute inset-0 z-50 items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <div class="glass-card w-full max-w-sm p-6 sm:p-8 rounded-[2rem] text-center shadow-2xl border border-slate-600">
                 <div class="bg-red-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
                     <i data-lucide="alert-circle" class="text-red-400 w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl sm:text-2xl font-black text-white mb-2 leading-tight">
-                    Execute <span id="vote-target-name" class="text-red-400">Player</span>?
-                </h3>
+                <h3 class="text-xl sm:text-2xl font-black text-white mb-2 leading-tight">Execute <span id="vote-target-name" class="text-red-400">Player</span>?</h3>
                 <p class="text-sm text-slate-300 mb-8 px-2">Make sure you caught the right person...</p>
                 <div class="flex space-x-3">
                     <button onclick="closeVoteModal()" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">Cancel</button>
@@ -107,13 +53,13 @@
             </div>
         </div>
 
-        <!-- Global Modal for Deleting Category -->
+        <!-- Delete Modal -->
         <div id="delete-modal" class="hidden absolute inset-0 z-50 items-center justify-center p-4 bg-black/80 backdrop-blur-md">
             <div class="glass-card w-full max-w-sm p-6 sm:p-8 rounded-[2rem] text-center shadow-2xl border border-red-500/50">
                 <div class="bg-red-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
                     <i data-lucide="trash-2" class="text-red-400 w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl sm:text-2xl font-black text-white mb-2 leading-tight">Delete Category?</h3>
+                <h3 class="text-xl sm:text-2xl font-black text-white mb-2">Delete Category?</h3>
                 <p class="text-sm text-slate-300 mb-8 px-2">This action cannot be undone. Are you completely sure?</p>
                 <div class="flex space-x-3">
                     <button onclick="closeDeleteModal()" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">Cancel</button>
@@ -122,7 +68,7 @@
             </div>
         </div>
 
-        <!-- Global Modal for Series Winner -->
+        <!-- Winner Modal -->
         <div id="winner-modal" class="hidden absolute inset-0 z-50 items-center justify-center p-4 bg-black/80 backdrop-blur-md">
             <div class="glass-card w-full max-w-sm p-6 sm:p-8 rounded-[2rem] text-center shadow-2xl border border-amber-500/50">
                 <div class="bg-amber-500/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/50">
@@ -134,1279 +80,1456 @@
                 <button onclick="resetSeries()" class="w-full py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl font-bold shadow-lg transition-all">Start New Session</button>
             </div>
         </div>
-
     </div>
 
     <script>
-        // --- Database ---
-        const WORD_DATABASE = {
-            'Sports': ['Soccer', 'Basketball', 'Baseball', 'Tennis', 'Golf', 'Rugby', 'Cricket', 'Volleyball', 'Table Tennis', 'Badminton', 'Swimming', 'Boxing', 'MMA', 'Wrestling', 'Hockey', 'Ice Hockey', 'Field Hockey', 'Gymnastics', 'Athletics', 'Track and Field', 'Cycling', 'Surfing', 'Snowboarding', 'Skiing', 'Skateboarding', 'Bowling', 'Archery', 'Fencing', 'Rowing', 'Sailing', 'Weightlifting', 'Martial Arts', 'Judo', 'Karate', 'Taekwondo', 'Water Polo', 'Handball', 'Lacrosse', 'Softball', 'Dodgeball'],
-            'Animals': ['Lion', 'Elephant', 'Giraffe', 'Penguin', 'Kangaroo', 'Dolphin', 'Tiger', 'Bear', 'Wolf', 'Eagle', 'Shark', 'Monkey', 'Zebra', 'Rhino', 'Hippo', 'Crocodile', 'Snake', 'Frog', 'Cheetah', 'Panther', 'Gorilla', 'Sloth', 'Bat', 'Owl', 'Koala', 'Panda', 'Camel', 'Fox', 'Deer', 'Moose', 'Rabbit', 'Squirrel', 'Horse', 'Cow', 'Pig', 'Sheep', 'Goat', 'Duck', 'Chicken', 'Turkey'],
-            'Food': ['Pizza', 'Sushi', 'Taco', 'Hamburger', 'Pasta', 'Ice Cream', 'Pancake', 'Salad', 'Steak', 'Waffle', 'Burrito', 'Sandwich', 'Hot Dog', 'Fries', 'Soup', 'Curry', 'Ramen', 'Dumplings', 'Noodles', 'Bread', 'Cheese', 'Bacon', 'Eggs', 'Chicken', 'Apple', 'Banana', 'Orange', 'Grapes', 'Strawberry', 'Chocolate', 'Cake', 'Cookie', 'Pie', 'Donut', 'Muffin', 'Croissant', 'Toast', 'Cereal', 'Oatmeal', 'Yogurt', 'Butter'],
-            'Objects': ['Smartphone', 'Laptop', 'Chair', 'Bicycle', 'Camera', 'Television', 'Watch', 'Headphones', 'Backpack', 'Shoes', 'Guitar', 'Glasses', 'Table', 'Bed', 'Sofa', 'Lamp', 'Clock', 'Mirror', 'Book', 'Wallet', 'Umbrella', 'Scissors', 'Knife', 'Pencil', 'Pen', 'Eraser', 'Notebook', 'Stapler', 'Tape', 'Glue', 'Ruler', 'Calculator', 'Lunchbox', 'Water Bottle', 'Keys', 'Purse', 'Sunglasses', 'Hat', 'Scarf', 'Gloves'],
-            'Locations': ['Beach', 'Mountain', 'Forest', 'Desert', 'City', 'Island', 'Jungle', 'Cave', 'Space Station', 'Castle', 'Hospital', 'School', 'Library', 'Museum', 'Park', 'Zoo', 'Aquarium', 'Theme Park', 'Cinema', 'Restaurant', 'Airport', 'Hotel', 'Bank', 'Post Office', 'Police Station', 'Fire Station', 'Supermarket', 'Bakery', 'Pharmacy', 'Gym', 'Stadium', 'Theater', 'Bowling Alley', 'Skating Rink', 'Arcade', 'Art Gallery', 'Church', 'Temple', 'Mosque', 'Synagogue'],
-            'NFL QBs': ['Patrick Mahomes', 'Josh Allen', 'Lamar Jackson', 'Joe Burrow', 'C.J. Stroud', 'Justin Herbert', 'Jalen Hurts', 'Brock Purdy', 'Dak Prescott', 'Jordan Love', 'Jared Goff', 'Matthew Stafford', 'Tua Tagovailoa', 'Trevor Lawrence', 'Aaron Rodgers', 'Kirk Cousins', 'Kyler Murray', 'Baker Mayfield', 'Jayden Daniels', 'Caleb Williams', 'Drake Maye', 'Bo Nix', 'Anthony Richardson', 'Will Levis', 'Bryce Young', 'Deshaun Watson', 'Geno Smith', 'Derek Carr', 'Sam Darnold', 'Russell Wilson', 'Daniel Jones', 'Gardner Minshew', 'Justin Fields'],
-            'Clash Royale': ['Knight', 'Archers', 'Goblins', 'Giant', 'PEKKA', 'Minions', 'Balloon', 'Witch', 'Barbarians', 'Golem', 'Skeletons', 'Valkyrie', 'Hog Rider', 'Bomber', 'Musketeer', 'Baby Dragon', 'Prince', 'Wizard', 'Mini PEKKA', 'Skeleton Army', 'X-Bow', 'Inferno Tower', 'Rocket', 'Goblin Barrel', 'Freeze', 'Mirror', 'Lightning', 'The Log', 'Miner', 'Princess', 'Ice Wizard', 'Lumberjack', 'Lava Hound', 'Sparky', 'Mega Knight', 'Electro Wizard', 'Bandit'],
-            'Games': ['Minecraft', 'Monopoly', 'Chess', 'Poker', 'Tetris', 'Fortnite', 'Scrabble', 'Mario Kart', 'Zelda', 'Roblox', 'Checkers', 'Catan', 'Uno', 'Cards Against Humanity', 'Charades', 'Twister', 'Hide and Seek', 'Pac-Man', 'Call of Duty', 'Overwatch', 'Valorant', 'League of Legends', 'Dota 2', 'CS:GO', 'Apex Legends', 'Rocket League', 'Among Us', 'Fall Guys', 'Genshin Impact', 'Elden Ring', 'Skyrim', 'The Witcher 3', 'Red Dead Redemption 2', 'GTA V', 'Super Smash Bros', 'Animal Crossing'],
-            'Anime': ['Naruto', 'Dragon Ball', 'One Piece', 'Attack on Titan', 'Death Note', 'My Hero Academia', 'Demon Slayer', 'Bleach', 'Evangelion', 'Pokemon', 'Fullmetal Alchemist', 'Hunter x Hunter', 'Cowboy Bebop', 'Spirited Away', 'Jujutsu Kaisen', 'Chainsaw Man', 'Spy x Family', 'JoJos Bizarre Adventure', 'Tokyo Ghoul', 'Sword Art Online', 'Fairy Tail', 'Black Clover', 'Haikyuu', 'Kuroko no Basket', 'Sailor Moon', 'Cardcaptor Sakura', 'Inuyasha', 'Yu Yu Hakusho', 'Rurouni Kenshin', 'Gintama', 'Mob Psycho 100', 'One Punch Man', 'Dr. Stone', 'Promised Neverland'],
-            'Superpowers': ['Flight', 'Invisibility', 'Telepathy', 'Strength', 'Time Travel', 'Telekinesis', 'Speed', 'Healing', 'Shapeshifting', 'X-Ray', 'Teleportation', 'Mind Control', 'Force Fields', 'Fire Manipulation', 'Water Manipulation', 'Immortality', 'Invulnerability', 'Super Hearing', 'Super Vision', 'Elasticity', 'Intangibility', 'Gravity Manipulation', 'Weather Control', 'Lightning Manipulation', 'Earth Manipulation', 'Ice Manipulation', 'Sonic Scream', 'Animal Control', 'Plant Manipulation', 'Illusion Creation', 'Precognition', 'Technopathy', 'Size Alteration', 'Duplication', 'Energy Blasts']
-        };
+    // ─── Database ────────────────────────────────────────────────────────────────
+    const WORD_DATABASE = {
+        'Sports': ['Soccer','Basketball','Baseball','Tennis','Golf','Rugby','Cricket','Volleyball','Table Tennis','Badminton','Swimming','Boxing','MMA','Wrestling','Hockey','Ice Hockey','Field Hockey','Gymnastics','Athletics','Track and Field','Cycling','Surfing','Snowboarding','Skiing','Skateboarding','Bowling','Archery','Fencing','Rowing','Sailing','Weightlifting','Martial Arts','Judo','Karate','Taekwondo','Water Polo','Handball','Lacrosse','Softball','Dodgeball'],
+        'Animals': ['Lion','Elephant','Giraffe','Penguin','Kangaroo','Dolphin','Tiger','Bear','Wolf','Eagle','Shark','Monkey','Zebra','Rhino','Hippo','Crocodile','Snake','Frog','Cheetah','Panther','Gorilla','Sloth','Bat','Owl','Koala','Panda','Camel','Fox','Deer','Moose','Rabbit','Squirrel','Horse','Cow','Pig','Sheep','Goat','Duck','Chicken','Turkey'],
+        'Food': ['Pizza','Sushi','Taco','Hamburger','Pasta','Ice Cream','Pancake','Salad','Steak','Waffle','Burrito','Sandwich','Hot Dog','Fries','Soup','Curry','Ramen','Dumplings','Noodles','Bread','Cheese','Bacon','Eggs','Chicken','Apple','Banana','Orange','Grapes','Strawberry','Chocolate','Cake','Cookie','Pie','Donut','Muffin','Croissant','Toast','Cereal','Oatmeal','Yogurt','Butter'],
+        'Objects': ['Smartphone','Laptop','Chair','Bicycle','Camera','Television','Watch','Headphones','Backpack','Shoes','Guitar','Glasses','Table','Bed','Sofa','Lamp','Clock','Mirror','Book','Wallet','Umbrella','Scissors','Knife','Pencil','Pen','Eraser','Notebook','Stapler','Tape','Glue','Ruler','Calculator','Lunchbox','Water Bottle','Keys','Purse','Sunglasses','Hat','Scarf','Gloves'],
+        'Locations': ['Beach','Mountain','Forest','Desert','City','Island','Jungle','Cave','Space Station','Castle','Hospital','School','Library','Museum','Park','Zoo','Aquarium','Theme Park','Cinema','Restaurant','Airport','Hotel','Bank','Post Office','Police Station','Fire Station','Supermarket','Bakery','Pharmacy','Gym','Stadium','Theater','Bowling Alley','Skating Rink','Arcade','Art Gallery','Church','Temple','Mosque','Synagogue'],
+        'NFL QBs': ['Patrick Mahomes','Josh Allen','Lamar Jackson','Joe Burrow','C.J. Stroud','Justin Herbert','Jalen Hurts','Brock Purdy','Dak Prescott','Jordan Love','Jared Goff','Matthew Stafford','Tua Tagovailoa','Trevor Lawrence','Aaron Rodgers','Kirk Cousins','Kyler Murray','Baker Mayfield','Jayden Daniels','Caleb Williams','Drake Maye','Bo Nix','Anthony Richardson','Will Levis','Bryce Young','Deshaun Watson','Geno Smith','Derek Carr','Sam Darnold','Russell Wilson','Daniel Jones','Gardner Minshew','Justin Fields'],
+        'Clash Royale': ['Knight','Archers','Goblins','Giant','PEKKA','Minions','Balloon','Witch','Barbarians','Golem','Skeletons','Valkyrie','Hog Rider','Bomber','Musketeer','Baby Dragon','Prince','Wizard','Mini PEKKA','Skeleton Army','X-Bow','Inferno Tower','Rocket','Goblin Barrel','Freeze','Mirror','Lightning','The Log','Miner','Princess','Ice Wizard','Lumberjack','Lava Hound','Sparky','Mega Knight','Electro Wizard','Bandit'],
+        'Games': ['Minecraft','Monopoly','Chess','Poker','Tetris','Fortnite','Scrabble','Mario Kart','Zelda','Roblox','Checkers','Catan','Uno','Cards Against Humanity','Charades','Twister','Hide and Seek','Pac-Man','Call of Duty','Overwatch','Valorant','League of Legends','Dota 2','CS:GO','Apex Legends','Rocket League','Among Us','Fall Guys','Genshin Impact','Elden Ring','Skyrim','The Witcher 3','Red Dead Redemption 2','GTA V','Super Smash Bros','Animal Crossing'],
+        'Anime': ['Naruto','Dragon Ball','One Piece','Attack on Titan','Death Note','My Hero Academia','Demon Slayer','Bleach','Evangelion','Pokemon','Fullmetal Alchemist','Hunter x Hunter','Cowboy Bebop','Spirited Away','Jujutsu Kaisen','Chainsaw Man','Spy x Family','JoJos Bizarre Adventure','Tokyo Ghoul','Sword Art Online','Fairy Tail','Black Clover','Haikyuu','Kuroko no Basket','Sailor Moon','Cardcaptor Sakura','Inuyasha','Yu Yu Hakusho','Rurouni Kenshin','Gintama','Mob Psycho 100','One Punch Man','Dr. Stone','Promised Neverland'],
+        'Superpowers': ['Flight','Invisibility','Telepathy','Strength','Time Travel','Telekinesis','Speed','Healing','Shapeshifting','X-Ray','Teleportation','Mind Control','Force Fields','Fire Manipulation','Water Manipulation','Immortality','Invulnerability','Super Hearing','Super Vision','Elasticity','Intangibility','Gravity Manipulation','Weather Control','Lightning Manipulation','Earth Manipulation','Ice Manipulation','Sonic Scream','Animal Control','Plant Manipulation','Illusion Creation','Precognition','Technopathy','Size Alteration','Duplication','Energy Blasts']
+    };
 
-        const INITIAL_CATEGORIES = Object.keys(WORD_DATABASE).map(name => ({
-            name,
-            words: WORD_DATABASE[name].length,
-            type: ['NFL QBs', 'Clash Royale', 'Anime', 'Superpowers'].includes(name) ? 'pro' : 'free'
-        }));
+    // Rule: knowing the category you should be able to narrow to ~3-6 plausible answers, not 1 and not 30
+    const HINT_DATABASE = {
+        // Sports: hint should fit maybe 3-5 sports, not just one
+        'Soccer':'Whistle',         // refs use whistles in many sports
+        'Basketball':'Hardwood',    // could be hockey, volleyball too
+        'Baseball':'Dugout',        // shared with softball but vague
+        'Tennis':'Seeding',         // rankings exist in many sports
+        'Golf':'Caddy',             // specific role but not the sport name
+        'Rugby':'Scrum',            // technical but not googled easily
+        'Cricket':'Crease',         // very obscure to non-fans
+        'Volleyball':'Rotation',    // positional term in multiple sports
+        'Table Tennis':'Spin',      // applies to tennis, pool, baseball
+        'Badminton':'Shuttle',      // the projectile name
+        'Swimming':'Taper',         // training term used in running too
+        'Boxing':'Cornerman',       // not ring — cornerman is obscure enough
+        'MMA':'Tapout',             // submission but not sport name
+        'Wrestling':'Singlet',      // the outfit
+        'Hockey':'Penalty',         // shared across many sports
+        'Ice Hockey':'Zamboni',     // vehicle, not sport mechanic
+        'Field Hockey':'Turf',      // surface shared with soccer
+        'Gymnastics':'Chalk',       // used in weightlifting too
+        'Athletics':'Baton',        // relay term
+        'Track and Field':'Hurdle', // equipment not sport name
+        'Cycling':'Peloton',        // group term
+        'Surfing':'Wax',            // vague material
+        'Snowboarding':'Halfpipe',  // structure not sport name
+        'Skiing':'Lodge',           // location around the sport
+        'Skateboarding':'Grind',    // trick term
+        'Bowling':'Polish',         // maintenance, not gameplay
+        'Archery':'Fletch',         // feather on arrow, very obscure
+        'Fencing':'Piste',          // the strip, very obscure
+        'Rowing':'Rigger',          // boat part
+        'Sailing':'Knot',           // speed unit, not sail
+        'Weightlifting':'Chalk',    // shared with gymnastics
+        'Martial Arts':'Dojo',      // location used for many disciplines
+        'Judo':'Gi',                // outfit shared with karate
+        'Karate':'Kata',            // form name
+        'Taekwondo':'Hogu',         // chest guard, very obscure
+        'Water Polo':'Cap',         // gear shared with swimming
+        'Handball':'Resin',         // grip substance
+        'Lacrosse':'Pocket',        // part of stick
+        'Softball':'Dugout',        // shared with baseball
+        'Dodgeball':'Gymnasium',    // location
 
-        const PUNISHMENTS = [
-            "Do 10 pushups right now.",
-            "Let the group post a status on your phone.",
-            "Speak in a British accent for the next round.",
-            "Take a shot or drink a full glass of water.",
-            "Do your best impression of another player.",
-            "Sing everything you say for the next 5 minutes.",
-            "Give the winner a massage for 1 minute.",
-            "Show the group the last photo in your camera roll.",
-            "Let the group text one person in your contacts.",
-            "Do a plank for 45 seconds.",
-            "Speak in the 3rd person for the entire next round.",
-            "Wear your shirt inside out for the rest of the game.",
-            "Hold an ice cube in your hand until it melts.",
-            "Do your best dance move for 10 seconds.",
-            "Keep your eyes closed for the entirety of the next round.",
-            "Communicate only in whispers for the next round.",
-            "Stand up during the entire next round.",
-            "You cannot use the words 'I', 'me', or 'my' next round.",
-            "Let the group draw something small on your arm with a pen.",
-            "Eat a spoonful of a condiment chosen by the group."
-        ];
+        // Animals: hint should fit 4-8 animals plausibly
+        'Lion':'Coalition',         // group name, obscure
+        'Elephant':'Musth',         // hormonal state, very obscure
+        'Giraffe':'Ossicone',       // horn nub, very obscure
+        'Penguin':'Rookery',        // colony term used for seals too
+        'Kangaroo':'Joey',          // baby name, somewhat known
+        'Dolphin':'Melon',          // the forehead organ
+        'Tiger':'Ambush',           // group name, also a tactic
+        'Bear':'Sow',               // female name, also a pig term
+        'Wolf':'Pack',              // group — could be dogs, fish
+        'Eagle':'Thermal',          // what they ride — could be hang gliders
+        'Shark':'Lateral',          // lateral line — fish have this
+        'Monkey':'Troop',           // group — could be soldiers
+        'Zebra':'Dazzle',           // group of zebras
+        'Rhino':'Crash',            // group of rhinos
+        'Hippo':'Bloat',            // group of hippos
+        'Crocodile':'Bask',         // behavior shared with lizards
+        'Snake':'Slough',           // skin shedding — shared with lizards
+        'Frog':'Spawn',             // eggs — shared with fish
+        'Cheetah':'Sprint',         // behavior — could be greyhound
+        'Panther':'Melanistic',     // color condition
+        'Gorilla':'Silverback',     // known but needs context
+        'Sloth':'Arboreal',         // tree-dwelling — shared with koala
+        'Bat':'Roost',              // where they live — could be birds
+        'Owl':'Pellet',             // regurgitated bones
+        'Koala':'Arboreal',         // tree-dwelling — shared with sloth
+        'Panda':'Solitary',         // behavior — shared with many animals
+        'Camel':'Caravan',          // group — could mean travel
+        'Fox':'Earth',              // a fox den — also just a word
+        'Deer':'Velvet',            // antler growth stage
+        'Moose':'Wallow',           // mud bath — shared with hippo
+        'Rabbit':'Warren',          // burrow system
+        'Squirrel':'Midden',        // food cache pile
+        'Horse':'Withers',          // part of back
+        'Cow':'Cud',                // chewing — shared with sheep
+        'Pig':'Farrow',             // birthing term
+        'Sheep':'Lanolin',          // wool grease
+        'Goat':'Wether',            // castrated male
+        'Duck':'Preening',          // shared with most birds
+        'Chicken':'Moult',          // shared with most birds
+        'Turkey':'Caruncle',        // the red neck thing
 
-        const WILDCARDS = [
-            "Clues must be exactly 4 letters long.",
-            "Whisper your clue.",
-            "Say your clue twice (e.g., 'hot, hot').",
-            "No eye contact while giving your clue.",
-            "Your clue must be an action word (verb).",
-            "Sing your clue.",
-            "Clues must start with a vowel.",
-            "Clues must end with a vowel.",
-            "Talk like a robot while giving your clue.",
-            "Clues must be exactly 5 letters long."
-        ];
+        // Food: hint should fit 4-8 foods plausibly
+        'Pizza':'Cornicione',       // crust edge, very obscure
+        'Sushi':'Nori',             // seaweed — also in other Asian dishes
+        'Taco':'Masa',              // corn dough — shared with burrito
+        'Hamburger':'Patty',        // component — could be chicken burger
+        'Pasta':'Semolina',         // flour type — shared with bread
+        'Ice Cream':'Overrun',      // air percentage, very obscure
+        'Pancake':'Griddle',        // tool — shared with eggs, bacon
+        'Salad':'Emulsify',         // dressing technique — also soups
+        'Steak':'Marbling',         // fat distribution — also lamb
+        'Waffle':'Leavening',       // baking term — shared widely
+        'Burrito':'Masa',           // shared with taco
+        'Sandwich':'Crumb',         // inside of bread — shared widely
+        'Hot Dog':'Casing',         // sausage skin — shared with sausage
+        'Fries':'Blanch',           // cooking technique — shared widely
+        'Soup':'Mirepoix',          // base veg — also stews
+        'Curry':'Temper',           // spice technique — also chocolate
+        'Ramen':'Tare',             // seasoning base, obscure
+        'Dumplings':'Pleat',        // fold pattern — also pastry
+        'Noodles':'Extrude',        // how they're made — also pasta
+        'Bread':'Crumb',            // interior texture
+        'Cheese':'Rind',            // exterior — also salami
+        'Bacon':'Cure',             // preservation — also ham, salami
+        'Eggs':'Albumen',           // egg white term
+        'Chicken':'Truss',          // tying for roasting — also turkey
+        'Apple':'Cultivar',         // variety — shared with grapes, pears
+        'Banana':'Cluster',         // how they grow — shared with grapes
+        'Orange':'Pith',            // white inner layer — shared with lemon
+        'Grapes':'Tendril',         // vine part — also hops, beans
+        'Strawberry':'Achene',      // the seeds technically
+        'Chocolate':'Conche',       // grinding machine
+        'Cake':'Crumb',             // texture term — shared with bread
+        'Cookie':'Spread',          // how it expands baking
+        'Pie':'Crimping',           // crust edge technique
+        'Donut':'Proof',            // rising step — shared with bread
+        'Muffin':'Dome',            // the top shape
+        'Croissant':'Laminate',     // layering — also puff pastry
+        'Toast':'Maillard',         // browning reaction — shared widely
+        'Cereal':'Flake',           // shape — could be oats
+        'Oatmeal':'Groat',          // whole oat grain
+        'Yogurt':'Whey',            // liquid byproduct — also cheese
+        'Butter':'Churn',           // process — also cream
 
-        // --- State ---
-        let state = {
-            screen: 'home',
-            players: [
-                { id: 1, name: 'Player 1', score: 0 }, 
-                { id: 2, name: 'Player 2', score: 0 }, 
-                { id: 3, name: 'Player 3', score: 0 },
-                { id: 4, name: 'Player 4', score: 0 },
-                { id: 5, name: 'Player 5', score: 0 }
-            ],
-            imposterCount: 1,
-            customCategories: [],
-            customForm: { id: null, name: '', wordsText: '', error: '' },
-            settings: {
-                blindImposter: false,
-                clueRounds: 2,
-                timeLimit: 0,
-                scoreLimit: 5,
-                punishments: true,
-                jesterRole: false,
-                wildcardRounds: false
-            },
-            game: {
-                category: '',
-                secretWord: '',
-                imposterIds: [],
-                jesterId: null,
-                activeWildcard: null,
-                currentPlayerIndex: 0,
-                roleRevealed: false,
-                winner: null, 
-                shuffledPlayers: [],
-                activeTurnIndex: 0,
-                timeLeft: 0,
-                currentPunishment: '',
-                punishedPlayer: null,
-                lastVotedId: null,
-                earnings: {} 
-            },
-            pendingVoteId: null
-        };
+        // Objects: hint should fit 4-8 objects plausibly
+        'Smartphone':'Haptic',      // vibration — also game controllers
+        'Laptop':'Hinge',           // mechanical — also doors, glasses
+        'Chair':'Spindle',          // leg part — also spinning wheel
+        'Bicycle':'Derailleur',     // gear mechanism, obscure
+        'Camera':'Aperture',        // setting — also telescopes
+        'Television':'Bezel',       // frame — also phone, monitor
+        'Watch':'Complication',     // extra function term
+        'Headphones':'Driver',      // speaker component
+        'Backpack':'Sternum',       // chest strap — also anatomy
+        'Shoes':'Welt',             // sole joining — also sofa seam
+        'Guitar':'Fret',            // neck marker — also bass, ukulele
+        'Glasses':'Temple',         // arm — also anatomy
+        'Table':'Apron',            // frame under top — also carpentry
+        'Bed':'Slat',               // support boards — also blinds
+        'Sofa':'Welt',              // seam term — shared
+        'Lamp':'Diffuser',          // light spreader — also camera
+        'Clock':'Escapement',       // mechanism term
+        'Mirror':'Silvering',       // backing process
+        'Book':'Folio',             // page term — also notebook
+        'Wallet':'Billfold',        // alternate name
+        'Umbrella':'Ferrule',       // tip — also cane, pencil
+        'Scissors':'Pivot',         // the screw — also compass
+        'Knife':'Bolster',          // guard between blade/handle
+        'Pencil':'Ferrule',         // metal band — also umbrella
+        'Pen':'Nib',                // writing tip — also calligraphy
+        'Eraser':'Vulcanize',       // rubber process
+        'Notebook':'Gutter',        // center margin — also books
+        'Stapler':'Anvil',          // bending plate
+        'Tape':'Crepe',             // backing material
+        'Glue':'Viscosity',         // thickness — also paint, syrup
+        'Ruler':'Calibration',      // accuracy — also instruments
+        'Calculator':'Mantissa',    // decimal log part, obscure
+        'Lunchbox':'Gasket',        // seal — also containers
+        'Water Bottle':'Bisphenol', // BPA, obscure chemistry
+        'Keys':'Bow',               // round top part
+        'Purse':'Gusset',           // side panel — also bags
+        'Sunglasses':'Polarize',    // lens treatment
+        'Hat':'Sweatband',          // inner band — also headband
+        'Scarf':'Fringe',           // end threads — also rugs
+        'Gloves':'Gusset',          // finger joint piece
 
-        let timerInterval = null;
+        // Locations: hint should fit 4-8 locations
+        'Beach':'Littoral',         // coastal zone — also cliffs
+        'Mountain':'Treeline',      // elevation boundary — also hills
+        'Forest':'Understory',      // layer below canopy — also jungle
+        'Desert':'Reg',             // rocky desert type
+        'City':'Precinct',          // district — also police station
+        'Island':'Atoll',           // ring island type
+        'Jungle':'Liana',           // hanging vine — also forest
+        'Cave':'Speleothem',        // cave formation
+        'Space Station':'Cupola',   // observation module
+        'Castle':'Merlon',          // battlement top
+        'Hospital':'Triage',        // sorting process
+        'School':'Recess',          // break time — also park
+        'Library':'Stacks',         // shelving area
+        'Museum':'Provenance',      // object history — also gallery
+        'Park':'Gazebo',            // structure — also garden
+        'Zoo':'Paddock',            // enclosure — also farm
+        'Aquarium':'Sump',          // filtration tank
+        'Theme Park':'Turnstile',   // entrance — also subway
+        'Cinema':'Projection',      // the beam — also theater
+        'Restaurant':'Mise',        // mise en place
+        'Airport':'Jetway',         // boarding bridge
+        'Hotel':'Turndown',         // bed service
+        'Bank':'Escrow',            // holding account
+        'Post Office':'Franking',   // stamp marking
+        'Police Station':'Precinct',// district — also city
+        'Fire Station':'Quint',     // type of fire truck
+        'Supermarket':'Planogram',  // shelf layout plan
+        'Bakery':'Proofer',         // dough rising cabinet
+        'Pharmacy':'Formulary',     // approved drug list
+        'Gym':'Squat',              // exercise — also stadium
+        'Stadium':'Fascia',         // facade band — also theater
+        'Theater':'Proscenium',     // stage arch
+        'Bowling Alley':'Approach', // run-up area
+        'Skating Rink':'Dasher',    // the boards
+        'Arcade':'Marquee',         // sign — also theater, cinema
+        'Art Gallery':'Provenance', // shared with museum
+        'Church':'Narthex',         // entrance vestibule
+        'Temple':'Sanctum',         // inner chamber — also church
+        'Mosque':'Mihrab',          // prayer niche
+        'Synagogue':'Bimah',        // reading platform
 
-        // --- Local Storage Management ---
-        const LOCAL_STORAGE_KEY = 'imposterGame_customCategories';
+        // NFL QBs: hint should fit 4-8 QBs on the list — no stadium names (too specific), no unique team colors
+        'Patrick Mahomes':'Playoff',    // multiple QBs go to playoffs
+        'Josh Allen':'Scramble',        // multiple QBs scramble
+        'Lamar Jackson':'Mobile',       // multiple mobile QBs on list
+        'Joe Burrow':'Pocket',          // pocket passers — several on list
+        'C.J. Stroud':'Debut',          // several rookies/new starters
+        'Justin Herbert':'Pocket',      // shared with Burrow
+        'Jalen Hurts':'Scramble',       // shared with Allen
+        'Brock Purdy':'Undrafted',      // he was last pick — fairly unique but not name
+        'Dak Prescott':'Contract',      // big contract — several QBs
+        'Jordan Love':'Successor',      // took over from legend — also Fields
+        'Jared Goff':'Comeback',        // multiple QBs known for this
+        'Matthew Stafford':'Veteran',   // multiple veterans on list
+        'Tua Tagovailoa':'Concussion',  // known story but not his name
+        'Trevor Lawrence':'Prospect',   // top prospect — also Bryce Young
+        'Aaron Rodgers':'Veteran',      // shared with Stafford
+        'Kirk Cousins':'Contract',      // big contract — shared
+        'Kyler Murray':'Scramble',      // shared with Allen, Hurts
+        'Baker Mayfield':'Journeyman',  // multiple team QB
+        'Jayden Daniels':'Debut',       // shared with Stroud
+        'Caleb Williams':'Prospect',    // shared with Lawrence
+        'Drake Maye':'Prospect',        // shared with Lawrence, Williams
+        'Bo Nix':'Debut',               // shared with Stroud, Daniels
+        'Anthony Richardson':'Mobile',  // shared with Jackson, Murray
+        'Will Levis':'Pocket',          // shared with Herbert, Burrow
+        'Bryce Young':'Prospect',       // shared with Lawrence, Williams
+        'Deshaun Watson':'Comeback',    // shared with Goff
+        'Geno Smith':'Journeyman',      // shared with Mayfield
+        'Derek Carr':'Veteran',         // shared with Stafford, Rodgers
+        'Sam Darnold':'Journeyman',     // shared with Mayfield, Smith
+        'Russell Wilson':'Veteran',     // shared with Stafford, Rodgers
+        'Daniel Jones':'Journeyman',    // shared with Mayfield
+        'Gardner Minshew':'Journeyman', // shared with Mayfield
+        'Justin Fields':'Mobile',       // shared with Jackson, Murray
 
-        function loadCategoriesFromStorage() {
-            const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+        // Clash Royale: hint should fit 4-8 cards — no card-specific mechanics
+        'Knight':'Melee',           // many melee cards
+        'Archers':'Ranged',         // multiple ranged cards
+        'Goblins':'Swarm',          // multiple swarm cards
+        'Giant':'Tanky',            // multiple tank cards
+        'PEKKA':'Tanky',            // shared with Giant, Golem
+        'Minions':'Aerial',         // multiple air cards
+        'Balloon':'Aerial',         // shared with Minions, Dragon
+        'Witch':'Swarm',            // summons skeletons
+        'Barbarians':'Swarm',       // shared with Goblins
+        'Golem':'Tanky',            // shared with Giant, PEKKA
+        'Skeletons':'Swarm',        // shared with Skeleton Army
+        'Valkyrie':'Melee',         // shared with Knight
+        'Hog Rider':'Melee',        // shared with Knight
+        'Bomber':'Ranged',          // shared with Archers
+        'Musketeer':'Ranged',       // shared with Archers
+        'Baby Dragon':'Aerial',     // shared with Balloon, Minions
+        'Prince':'Melee',           // shared with Knight
+        'Wizard':'Ranged',          // shared with Musketeer
+        'Mini PEKKA':'Melee',       // shared with Knight
+        'Skeleton Army':'Swarm',    // shared with Goblins
+        'X-Bow':'Building',         // multiple buildings
+        'Inferno Tower':'Building', // shared with X-Bow
+        'Rocket':'Spell',           // multiple spells
+        'Goblin Barrel':'Spell',    // shared with Rocket
+        'Freeze':'Spell',           // shared with Rocket
+        'Mirror':'Spell',           // shared with others
+        'Lightning':'Spell',        // shared with Rocket
+        'The Log':'Spell',          // shared with others
+        'Miner':'Melee',            // shared with Knight
+        'Princess':'Ranged',        // shared with Archers
+        'Ice Wizard':'Ranged',      // shared with Musketeer
+        'Lumberjack':'Melee',       // shared with Knight
+        'Lava Hound':'Aerial',      // shared with Balloon
+        'Sparky':'Ranged',          // shared with Musketeer
+        'Mega Knight':'Melee',      // shared with Knight
+        'Electro Wizard':'Ranged',  // shared with Musketeer
+        'Bandit':'Melee',           // shared with Knight
+
+        // Games: hint should fit 4-8 games — no unique mechanic names
+        'Minecraft':'Crafting',     // crafting exists in Zelda, Roblox, Genshin
+        'Monopoly':'Banker',        // role in board games
+        'Chess':'Gambit',           // strategy term — also poker
+        'Poker':'Bluff',            // also in Among Us, social games
+        'Tetris':'Rotation',        // mechanic in many games
+        'Fortnite':'Storm',         // shrinking zone — also Apex, CoD
+        'Scrabble':'Tile',          // tiles in many board games
+        'Mario Kart':'Kart',        // racing — also Rocket League
+        'Zelda':'Dungeon',          // dungeons in many RPGs
+        'Roblox':'Avatar',          // customization — also Fortnite
+        'Checkers':'Diagonal',      // movement type — also chess
+        'Catan':'Settlement',       // building — also Minecraft
+        'Uno':'Deck',               // card deck — also Poker
+        'Cards Against Humanity':'Prompt', // also Charades, Scrabble
+        'Charades':'Mime',          // acting — could be Twister warmup
+        'Twister':'Balance',        // physical — also Wii games
+        'Hide and Seek':'Seeker',   // also tag games
+        'Pac-Man':'Maze',           // also in dungeon games
+        'Call of Duty':'Loadout',   // also Valorant, Apex
+        'Overwatch':'Respawn',      // also CoD, Apex
+        'Valorant':'Ranked',        // also LoL, CS:GO
+        'League of Legends':'Lane', // also Dota 2
+        'Dota 2':'Creep',           // minions — also LoL
+        'CS:GO':'Ranked',           // shared with Valorant
+        'Apex Legends':'Respawn',   // shared with Overwatch
+        'Rocket League':'Ranked',   // shared with others
+        'Among Us':'Crewmate',      // role — fairly unique but not game name
+        'Fall Guys':'Qualify',      // elimination — also Mario Kart
+        'Genshin Impact':'Gacha',   // also in mobile games broadly
+        'Elden Ring':'Bonfire',     // rest point — also Skyrim
+        'Skyrim':'Bonfire',         // shared with Elden Ring
+        'The Witcher 3':'Contract', // also in RPGs broadly
+        'Red Dead Redemption 2':'Bounty', // also in GTA
+        'GTA V':'Bounty',           // shared with RDR2
+        'Super Smash Bros':'Stock', // lives system — also other fighters
+        'Animal Crossing':'Villager', // NPCs — also Minecraft
+
+        // Anime: hint should fit 4-8 shows — no show-unique power names
+        'Naruto':'Headband',        // worn in multiple anime
+        'Dragon Ball':'Tournament', // also My Hero, HxH
+        'One Piece':'Crew',         // also Fairy Tail, Cowboy Bebop
+        'Attack on Titan':'Wall',   // unique enough but not the title
+        'Death Note':'Notebook',    // unique prop but not the show name
+        'My Hero Academia':'Quirk', // unique term but not the show name
+        'Demon Slayer':'Breathing', // unique but not show name
+        'Bleach':'Bankai',          // unique term — Bleach fans know
+        'Evangelion':'Sync',        // unique but obscure
+        'Pokemon':'Trainer',        // shared with Digimon vibes
+        'Fullmetal Alchemist':'Array', // unique but not the show name
+        'Hunter x Hunter':'License',// also My Hero has licenses
+        'Cowboy Bebop':'Bounty',    // also One Piece, RDR2 overlap
+        'Spirited Away':'Bathhouse',// unique setting
+        'Jujutsu Kaisen':'Curse',   // also Bleach has cursed spirits
+        'Chainsaw Man':'Contract',  // also Witcher has contracts
+        'Spy x Family':'Mission',   // also in many action anime
+        'JoJos Bizarre Adventure':'Pose', // iconic but not the name
+        'Tokyo Ghoul':'Ward',       // district — also city anime
+        'Sword Art Online':'Floor', // dungeon floors — also Zelda
+        'Fairy Tail':'Guild',       // guilds in many fantasy anime
+        'Black Clover':'Grimoire',  // also in other magic anime
+        'Haikyuu':'Setter',         // position — also sports anime
+        'Kuroko no Basket':'Screen',// basketball play — also sports
+        'Sailor Moon':'Senshi',     // warrior — also in other magical girl
+        'Cardcaptor Sakura':'Seal', // sealing cards — also in other magic
+        'Inuyasha':'Shard',         // fragment — also in other quest anime
+        'Yu Yu Hakusho':'Territory',// also in HxH, Bleach
+        'Rurouni Kenshin':'Dojo',   // also martial arts anime
+        'Gintama':'Parody',         // comedy/parody — somewhat unique
+        'Mob Psycho 100':'Percent', // percentage — unique but not name
+        'One Punch Man':'Rank',     // hero ranking — also My Hero
+        'Dr. Stone':'Revival',      // resurrection — also in other anime
+        'Promised Neverland':'Score', // test score — fairly unique
+
+        // Superpowers: hint should fit 4-8 powers — no direct descriptions
+        'Flight':'Thermal',         // updraft — also weather control
+        'Invisibility':'Refract',   // light bending — also X-Ray
+        'Telepathy':'Synapse',      // brain connection — also mind control
+        'Strength':'Density',       // also invulnerability, size
+        'Time Travel':'Paradox',    // concept — also precognition
+        'Telekinesis':'Focus',      // mental focus — also telepathy
+        'Speed':'Inertia',          // physics — also strength
+        'Healing':'Tissue',         // biology — also shapeshifting
+        'Shapeshifting':'Adapt',    // also elasticity, size alteration
+        'X-Ray':'Frequency',        // wave — also super hearing, vision
+        'Teleportation':'Fold',     // space fold — also time travel
+        'Mind Control':'Impulse',   // nerve signal — also telepathy
+        'Force Fields':'Barrier',   // also intangibility defense
+        'Fire Manipulation':'Oxidize', // chemistry — also energy blasts
+        'Water Manipulation':'Current', // flow — also weather control
+        'Immortality':'Senescence', // aging term — also healing
+        'Invulnerability':'Dense',  // also strength, force fields
+        'Super Hearing':'Frequency',// shared with X-Ray
+        'Super Vision':'Spectrum',  // light — also X-Ray
+        'Elasticity':'Tensile',     // stretch — also size alteration
+        'Intangibility':'Permeable',// passing through — also teleportation
+        'Gravity Manipulation':'Mass', // physics — also strength
+        'Weather Control':'Pressure', // barometric — also water, lightning
+        'Lightning Manipulation':'Discharge', // also energy blasts
+        'Earth Manipulation':'Tectonic', // also gravity, strength
+        'Ice Manipulation':'Absolute', // absolute zero — also weather
+        'Sonic Scream':'Resonance', // vibration — also super hearing
+        'Animal Control':'Pheromone', // chemical signal
+        'Plant Manipulation':'Auxin', // growth hormone
+        'Illusion Creation':'Cortex', // brain — also telepathy
+        'Precognition':'Probability', // chance — also time travel
+        'Technopathy':'Circuit',    // electronics — also energy blasts
+        'Size Alteration':'Density',// shared with strength
+        'Duplication':'Mitosis',    // cell division
+        'Energy Blasts':'Photon'    // light particle — also X-Ray
+    };
+
+    const PUNISHMENTS = ["Do 10 pushups right now.","Let the group post a status on your phone.","Speak in a British accent for the next round.","Take a shot or drink a full glass of water.","Do your best impression of another player.","Sing everything you say for the next 5 minutes.","Give the winner a massage for 1 minute.","Show the group the last photo in your camera roll.","Let the group text one person in your contacts.","Do a plank for 45 seconds.","Speak in the 3rd person for the entire next round.","Wear your shirt inside out for the rest of the game.","Hold an ice cube in your hand until it melts.","Do your best dance move for 10 seconds.","Keep your eyes closed for the entirety of the next round.","Communicate only in whispers for the next round.","Stand up during the entire next round.","You cannot use the words 'I', 'me', or 'my' next round.","Let the group draw something small on your arm with a pen.","Eat a spoonful of a condiment chosen by the group."];
+    const WILDCARDS = ["Clues must be exactly 4 letters long.","Whisper your clue.","Say your clue twice (e.g., 'hot, hot').","No eye contact while giving your clue.","Your clue must be an action word (verb).","Sing your clue.","Clues must start with a vowel.","Clues must end with a vowel.","Talk like a robot while giving your clue.","Clues must be exactly 5 letters long."];
+    const GENERIC_HINTS = ["Thing","Concept","Item","Target","Subject","Noun","Entity","Object"];
+
+    // ─── State ───────────────────────────────────────────────────────────────────
+    let state = {
+        screen: 'home',
+        players: [
+            { id: 1, name: 'Player 1', score: 0 },
+            { id: 2, name: 'Player 2', score: 0 },
+            { id: 3, name: 'Player 3', score: 0 },
+            { id: 4, name: 'Player 4', score: 0 },
+            { id: 5, name: 'Player 5', score: 0 }
+        ],
+        imposterCount: 1,
+        customCategories: [],
+        selectedCategories: [],
+        customForm: { id: null, name: '', wordsText: '', error: '' },
+        settings: {
+            blindImposter: false,
+            imposterHints: false,
+            clueRounds: 2,
+            timeLimit: 0,
+            scoreLimit: 5,
+            punishments: true,
+            jesterRole: false,
+            wildcardRounds: false
+        },
+        game: {
+            category: '', secretWord: '', hint: '',
+            imposterIds: [], jesterId: null, activeWildcard: null,
+            currentPlayerIndex: 0, roleRevealed: false, winner: null,
+            shuffledPlayers: [], activeTurnIndex: 0, timeLeft: 0,
+            currentPunishment: '', punishedPlayer: null,
+            lastVotedId: null, earnings: {}
+        },
+        pendingVoteId: null
+    };
+
+    let timerInterval = null;
+
+    // ─── Storage ─────────────────────────────────────────────────────────────────
+    const STORAGE_KEY = 'imposterGame_customCategories';
+
+    function loadCategoriesFromStorage() {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    // Ensure older categories without IDs get one
-                    state.customCategories = parsed.map(cat => ({
-                        ...cat,
-                        id: cat.id || Date.now() + Math.random()
-                    }));
-                } catch(e) {
-                    console.error("Failed to load custom categories", e);
-                    state.customCategories = [];
-                }
+                const parsed = JSON.parse(stored);
+                state.customCategories = parsed.map(cat => ({
+                    ...cat,
+                    id: cat.id || (Date.now() + Math.random())
+                }));
             }
+        } catch(e) {
+            console.error('Failed to load custom categories:', e);
+            state.customCategories = [];
         }
+    }
 
-        function saveCategoriesToStorage() {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state.customCategories));
+    function saveCategoriesToStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.customCategories));
+    }
+
+    // ─── Utilities ───────────────────────────────────────────────────────────────
+    const shuffle = arr => {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
         }
+        return a;
+    };
 
-        // --- Utilities ---
-        const shuffle = (arr) => {
-            const newArr = [...arr];
-            for (let i = newArr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-            }
-            return newArr;
-        };
-        
-        const getEl = (id) => document.getElementById(id);
+    const getEl = id => document.getElementById(id);
+    const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const updateIcons = () => lucide.createIcons();
 
-        function updateIcons() {
-            lucide.createIcons();
+    function parseWordToken(token) {
+        const match = token.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+        if (match) return { word: match[1].trim(), hint: match[2].trim() };
+        return { word: token.trim(), hint: null };
+    }
+
+    // ─── Render ──────────────────────────────────────────────────────────────────
+    function render() {
+        const root = getEl('app-root');
+        const container = document.createElement('div');
+        container.className = 'screen-container active';
+        switch(state.screen) {
+            case 'home':         container.innerHTML = renderHome();         break;
+            case 'howToPlay':    container.innerHTML = renderHowToPlay();    break;
+            case 'setup':        container.innerHTML = renderSetup();        break;
+            case 'categories':   container.innerHTML = renderCategories();   break;
+            case 'createCustom': container.innerHTML = renderCreateCustom(); break;
+            case 'reveal':       container.innerHTML = renderReveal();       break;
+            case 'playing':      container.innerHTML = renderPlaying();      break;
+            case 'voting':       container.innerHTML = renderVoting();       break;
+            case 'result':       container.innerHTML = renderResult();       break;
+            default:             container.innerHTML = renderHome();
         }
+        root.innerHTML = '';
+        root.appendChild(container);
+        updateIcons();
+        manageTimer();
+    }
 
-        // --- UI Rendering ---
-        function render() {
-            const root = getEl('app-root');
-            root.innerHTML = '';
-            
-            const container = document.createElement('div');
-            container.className = 'screen-container active';
-            
-            switch(state.screen) {
-                case 'home': container.innerHTML = renderHome(); break;
-                case 'howToPlay': container.innerHTML = renderHowToPlay(); break;
-                case 'setup': container.innerHTML = renderSetup(); break;
-                case 'categories': container.innerHTML = renderCategories(); break;
-                case 'createCustom': container.innerHTML = renderCreateCustom(); break;
-                case 'reveal': container.innerHTML = renderReveal(); break;
-                case 'playing': container.innerHTML = renderPlaying(); break;
-                case 'voting': container.innerHTML = renderVoting(); break;
-                case 'result': container.innerHTML = renderResult(); break;
-            }
-            
-            root.appendChild(container);
-            updateIcons();
-            manageTimer();
-        }
+    function topBar(title, showBack = true, backAction = 'goToHome') {
+        return `
+            <div class="flex items-center mb-4 sm:mb-6 pt-6 relative z-10 shrink-0">
+                ${showBack ? `
+                    <button onclick="${backAction}()" class="p-2 -ml-2 text-slate-300 hover:text-white transition-colors bg-white/5 rounded-full backdrop-blur-sm mr-3">
+                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                ` : ''}
+                <h1 class="text-xl sm:text-2xl font-bold text-white tracking-wide">${esc(title)}</h1>
+            </div>
+        `;
+    }
 
-        function topBar(title, showBack = true, backAction = 'goToHome') {
-            return `
-                <div class="flex items-center mb-4 sm:mb-6 pt-6 relative z-10 shrink-0">
-                    ${showBack ? `
-                        <button onclick="${backAction}()" class="p-2 -ml-2 text-slate-300 hover:text-white transition-colors bg-white/5 rounded-full backdrop-blur-sm mr-3">
-                            <i data-lucide="chevron-left" class="w-6 h-6"></i>
-                        </button>
-                    ` : ''}
-                    <h1 class="text-xl sm:text-2xl font-bold text-white tracking-wide">${title}</h1>
+    // ─── Home ─────────────────────────────────────────────────────────────────────
+    function renderHome() {
+        return `
+            <div class="flex-1 overflow-y-auto flex flex-col items-center justify-center relative z-10 pb-6">
+                <div class="text-center space-y-6 mt-12 mb-auto">
+                    <div class="relative inline-block">
+                        <div class="absolute inset-0 bg-blue-500 blur-[40px] opacity-30 rounded-full"></div>
+                        <div class="relative bg-gradient-to-b from-slate-800 to-slate-900 p-6 rounded-3xl border border-slate-700 shadow-2xl">
+                            <i data-lucide="search" class="w-16 h-16 text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-slate-400 tracking-tighter drop-shadow-lg mb-2">IMPOSTER</h1>
+                        <p class="text-blue-200/60 text-base sm:text-lg font-medium tracking-wide">Find the liar among you</p>
+                    </div>
                 </div>
-            `;
-        }
+                <div class="w-full max-w-[280px] sm:max-w-xs space-y-4 shrink-0 mt-8">
+                    <button onclick="setScreen('setup')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="play" class="w-6 h-6 fill-current"></i><span>Play Now</span>
+                    </button>
+                    <button onclick="setScreen('howToPlay')" class="w-full py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-semibold text-lg transition-all">How to Play</button>
+                </div>
+            </div>
+        `;
+    }
 
-        // --- Screen Templates ---
-        function renderHome() {
-            return `
-                <div class="flex-1 overflow-y-auto flex flex-col items-center justify-center relative z-10 pb-6">
-                    <div class="text-center space-y-6 mt-12 mb-auto">
-                        <div class="relative inline-block group">
-                            <div class="absolute inset-0 bg-blue-500 blur-[40px] opacity-30 rounded-full"></div>
-                            <div class="relative bg-gradient-to-b from-slate-800 to-slate-900 p-6 rounded-3xl border border-slate-700 shadow-2xl">
-                                <i data-lucide="search" class="w-16 h-16 text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
-                            </div>
+    // ─── How To Play ──────────────────────────────────────────────────────────────
+    function renderHowToPlay() {
+        const steps = [
+            { icon:'settings',       title:'Setup Game',       desc:'Choose players, adjust imposters, and tweak advanced settings.' },
+            { icon:'eye',            title:'Reveal Words',      desc:'Everyone sees the secret word except the imposter(s).' },
+            { icon:'message-square', title:'Give Clues',        desc:'Take turns saying exactly ONE word related to your secret.' },
+            { icon:'search',         title:'Find the Imposter', desc:'Discuss and vote. Beware the Jester!' }
+        ];
+        return `
+            ${topBar('How to Play', true, 'goToHome')}
+            <div class="flex-1 overflow-y-auto space-y-4 pb-4 pr-1 custom-scrollbar">
+                ${steps.map(s => `
+                    <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-start space-x-4">
+                        <div class="bg-blue-500/10 p-3 rounded-full flex-shrink-0 mt-1 border border-blue-500/20">
+                            <i data-lucide="${s.icon}" class="w-6 h-6 text-blue-400"></i>
                         </div>
                         <div>
-                            <h1 class="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-slate-400 tracking-tighter drop-shadow-lg mb-2">IMPOSTER</h1>
-                            <p class="text-blue-200/60 text-base sm:text-lg font-medium tracking-wide">Find the liar among you</p>
+                            <h3 class="text-white font-bold text-base sm:text-lg mb-1">${s.title}</h3>
+                            <p class="text-slate-300 leading-relaxed text-sm">${s.desc}</p>
                         </div>
                     </div>
+                `).join('')}
+            </div>
+        `;
+    }
 
-                    <div class="w-full max-w-[280px] sm:max-w-xs space-y-4 shrink-0 mt-8">
-                        <button onclick="setScreen('setup')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex items-center justify-center space-x-2">
-                            <i data-lucide="play" class="w-6 h-6 fill-current"></i>
-                            <span>Play Now</span>
-                        </button>
-                        <button onclick="setScreen('howToPlay')" class="w-full py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-semibold text-lg transition-all">
-                            How to Play
-                        </button>
+    // ─── Setup ────────────────────────────────────────────────────────────────────
+    function renderSetup() {
+        const maxImposters = Math.max(1, state.players.length - 2);
+        if (state.imposterCount > maxImposters) state.imposterCount = maxImposters;
+        const canEnableJester = state.players.length >= 5;
+
+        const toggle = (key, color) => `
+            <button onclick="toggleSetting('${key}')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings[key] ? `bg-${color}-600` : 'bg-slate-700'}">
+                <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings[key] ? 'translate-x-6' : 'translate-x-0'}"></div>
+            </button>
+        `;
+
+        return `
+            ${topBar('Setup Game', true, 'goToHome')}
+            <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 flex flex-col space-y-4">
+                <div class="glass-card rounded-3xl p-4 sm:p-5 flex flex-col shrink-0 min-h-[220px] max-h-[350px]">
+                    <div class="flex justify-between items-center mb-4 shrink-0">
+                        <span class="text-white font-semibold flex items-center text-base sm:text-lg">
+                            <i data-lucide="users" class="w-5 h-5 mr-2 text-blue-400"></i> ${state.players.length} Players
+                        </span>
+                        ${state.players.length < 12 ? `
+                            <button onclick="addPlayer()" class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-white px-3 py-1.5 rounded-full flex items-center text-sm font-semibold transition-colors">
+                                <i data-lucide="user-plus" class="w-4 h-4 mr-1"></i> Add
+                            </button>
+                        ` : ''}
                     </div>
-                </div>
-            `;
-        }
-
-        function renderHowToPlay() {
-            const steps = [
-                { icon: 'settings', title: 'Setup Game', desc: 'Choose players, adjust imposters, and tweak advanced settings.' },
-                { icon: 'eye', title: 'Reveal Words', desc: 'Everyone sees the secret word except the imposter(s).' },
-                { icon: 'message-square', title: 'Give Clues', desc: 'Take turns saying exactly ONE word related to your secret.' },
-                { icon: 'search', title: 'Find the Imposter', desc: "Discuss and vote. Beware the Jester!" }
-            ];
-
-            return `
-                ${topBar('How to Play', true, 'goToHome')}
-                <div class="flex-1 overflow-y-auto space-y-4 pb-4 pr-1 custom-scrollbar">
-                    ${steps.map(step => `
-                        <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-start space-x-4">
-                            <div class="bg-blue-500/10 p-3 rounded-full flex-shrink-0 mt-1 shadow-[0_0_10px_rgba(59,130,246,0.1)] border border-blue-500/20">
-                                <i data-lucide="${step.icon}" class="w-6 h-6 text-blue-400"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-white font-bold text-base sm:text-lg mb-1">${step.title}</h3>
-                                <p class="text-slate-300 leading-relaxed text-sm">${step.desc}</p>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderSetup() {
-            const maxImposters = Math.max(1, state.players.length - 2);
-            if (state.imposterCount > maxImposters) state.imposterCount = maxImposters;
-            
-            const canEnableJester = state.players.length >= 5;
-
-            return `
-                ${topBar('Setup Game', true, 'goToHome')}
-                
-                <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 pb-4 flex flex-col space-y-4">
-                    
-                    <div class="glass-card rounded-3xl p-4 sm:p-5 flex flex-col shrink-0 min-h-[220px] max-h-[350px]">
-                        <div class="flex justify-between items-center mb-4 shrink-0">
-                            <span class="text-white font-semibold flex items-center text-base sm:text-lg">
-                                <i data-lucide="users" class="w-5 h-5 mr-2 text-blue-400"></i> ${state.players.length} Players
-                            </span>
-                            ${state.players.length < 12 ? `
-                                <button onclick="addPlayer()" class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-white px-3 py-1.5 rounded-full flex items-center text-sm font-semibold transition-colors">
-                                    <i data-lucide="user-plus" class="w-4 h-4 mr-1"></i> Add
-                                </button>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1 pb-2">
-                            ${state.players.map((player, index) => `
-                                <div class="flex items-center space-x-3 group">
-                                    <div class="bg-slate-800/80 border border-slate-700 text-blue-400 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-inner">
-                                        ${index + 1}
-                                    </div>
-                                    <input type="text" value="${player.name}" oninput="updatePlayerName(${player.id}, this.value)" 
-                                        class="flex-1 bg-black/20 border border-slate-700/50 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all"
-                                        placeholder="Player ${index + 1}">
-                                    
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-xs font-bold ${player.score < 0 ? 'text-red-400' : 'text-slate-500'} w-12 text-center bg-black/30 py-1 rounded-md">
-                                            ${player.score} pts
-                                        </span>
-                                        ${state.players.length > 3 ? `
-                                            <button onclick="removePlayer(${player.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all shrink-0">
-                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
-                                            </button>
-                                        ` : ''}
-                                    </div>
+                    <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1 pb-2">
+                        ${state.players.map((p, i) => `
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-slate-800/80 border border-slate-700 text-blue-400 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0">${i + 1}</div>
+                                <input type="text" value="${esc(p.name)}" oninput="updatePlayerName(${p.id}, this.value)"
+                                    class="flex-1 bg-black/20 border border-slate-700/50 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500/50 transition-all"
+                                    placeholder="Player ${i + 1}">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs font-bold ${p.score < 0 ? 'text-red-400' : 'text-slate-500'} w-12 text-center bg-black/30 py-1 rounded-md">${p.score} pts</span>
+                                    ${state.players.length > 3 ? `
+                                        <button onclick="removePlayer(${p.id})" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all">
+                                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                        </button>
+                                    ` : ''}
                                 </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="space-y-3 shrink-0">
+                    <div class="glass-card rounded-2xl p-4 flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="alert-circle" class="w-5 h-5 text-red-400"></i>
+                            <span class="text-white font-semibold">Imposters</span>
+                        </div>
+                        <div class="flex items-center space-x-4 bg-black/30 rounded-xl p-1 border border-slate-700/50">
+                            <button onclick="updateImposterCount(-1)" ${state.imposterCount <= 1 ? 'disabled' : ''} class="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors">
+                                <i data-lucide="minus" class="w-4 h-4"></i>
+                            </button>
+                            <span class="text-white font-bold w-4 text-center">${state.imposterCount}</span>
+                            <button onclick="updateImposterCount(1)" ${state.imposterCount >= maxImposters ? 'disabled' : ''} class="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-4 flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
+                            <span class="text-white font-semibold">Play To (Wins)</span>
+                        </div>
+                        <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
+                            ${[3,5,10].map(n => `
+                                <button onclick="updateSetting('scoreLimit',${n})" class="w-10 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.scoreLimit === n ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-slate-200'}">${n}</button>
                             `).join('')}
                         </div>
                     </div>
 
-                    <div class="space-y-3 shrink-0">
-                        <div class="glass-card rounded-2xl p-4 flex justify-between items-center border-blue-500/20">
-                            <div class="flex items-center space-x-2">
-                                <i data-lucide="alert-circle" class="w-5 h-5 text-red-400"></i>
-                                <span class="text-white font-semibold">Imposters</span>
-                            </div>
-                            <div class="flex items-center space-x-4 bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                                <button onclick="updateImposterCount(-1)" ${state.imposterCount <= 1 ? 'disabled' : ''} class="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors">
-                                    <i data-lucide="minus" class="w-4 h-4"></i>
-                                </button>
-                                <span class="text-white font-bold w-4 text-center">${state.imposterCount}</span>
-                                <button onclick="updateImposterCount(1)" ${state.imposterCount >= maxImposters ? 'disabled' : ''} class="p-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors">
-                                    <i data-lucide="plus" class="w-4 h-4"></i>
-                                </button>
-                            </div>
+                    <div class="glass-card rounded-2xl p-4 space-y-5">
+                        <div class="flex items-center space-x-2 border-b border-slate-700/50 pb-2">
+                            <i data-lucide="settings-2" class="w-4 h-4 text-purple-400"></i>
+                            <span class="text-white font-semibold text-sm uppercase tracking-wide">Advanced Settings</span>
                         </div>
 
-                        <div class="glass-card rounded-2xl p-4 flex justify-between items-center border-amber-500/20">
+                        ${[
+                            { key:'blindImposter',  color:'purple', icon:'eye-off',     label:'Blind Imposter',    sub:'Hide category from Imposter' },
+                            { key:'imposterHints',  color:'cyan',   icon:'help-circle', label:'Imposter Hints',    sub:'Give a vague 1-word hint' },
+                            { key:'punishments',    color:'orange', icon:'flame',       label:'Party Punishments', sub:'Losers get a random dare' },
+                            { key:'wildcardRounds', color:'emerald',icon:'sparkles',    label:'Wildcard Rounds',   sub:'Random goofy rule each game' },
+                        ].map(row => `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="${row.icon}" class="w-4 h-4 ${state.settings[row.key] ? `text-${row.color}-400` : 'text-slate-500'}"></i>
+                                    <div>
+                                        <span class="text-slate-200 text-sm font-medium block">${row.label}</span>
+                                        <span class="text-slate-500 text-[10px] block">${row.sub}</span>
+                                    </div>
+                                </div>
+                                ${toggle(row.key, row.color)}
+                            </div>
+                        `).join('')}
+
+                        <div class="flex items-center justify-between ${!canEnableJester ? 'opacity-50' : ''}">
                             <div class="flex items-center space-x-2">
-                                <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
-                                <span class="text-white font-semibold">Play To (Wins)</span>
+                                <i data-lucide="smile" class="w-4 h-4 ${state.settings.jesterRole && canEnableJester ? 'text-fuchsia-400' : 'text-slate-500'}"></i>
+                                <div>
+                                    <span class="text-slate-200 text-sm font-medium flex items-center">
+                                        Jester Role ${!canEnableJester ? '<i data-lucide="lock" class="w-3 h-3 ml-1 text-slate-500"></i>' : ''}
+                                    </span>
+                                    <span class="text-slate-500 text-[10px] block">${!canEnableJester ? 'Requires 5+ players' : 'Act suspicious. Get voted to win.'}</span>
+                                </div>
+                            </div>
+                            <button onclick="${canEnableJester ? "toggleSetting('jesterRole')" : ''}" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.jesterRole && canEnableJester ? 'bg-fuchsia-600' : 'bg-slate-700'} ${!canEnableJester ? 'cursor-not-allowed' : ''}">
+                                <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.jesterRole && canEnableJester ? 'translate-x-6' : 'translate-x-0'}"></div>
+                            </button>
+                        </div>
+
+                        <div class="flex flex-col space-y-2 pt-2 border-t border-slate-700/50">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4 text-blue-400"></i>
+                                <span class="text-slate-200 text-sm font-medium">Clues per Round</span>
                             </div>
                             <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                                ${[3, 5, 10].map(num => `
-                                    <button onclick="updateSetting('scoreLimit', ${num})" class="w-10 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.scoreLimit === num ? 'bg-amber-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
-                                        ${num}
-                                    </button>
+                                ${[1,2,3,4,5].map(n => `
+                                    <button onclick="updateSetting('clueRounds',${n})" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.clueRounds === n ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'}">${n}</button>
                                 `).join('')}
                             </div>
                         </div>
 
-                        <div class="glass-card rounded-2xl p-4 space-y-5 border-blue-500/20">
-                            <div class="flex items-center space-x-2 border-b border-slate-700/50 pb-2">
-                                <i data-lucide="settings-2" class="w-4 h-4 text-purple-400"></i>
-                                <span class="text-white font-semibold text-sm uppercase tracking-wide">Advanced Settings</span>
+                        <div class="flex flex-col space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="timer" class="w-4 h-4 text-amber-400"></i>
+                                <span class="text-slate-200 text-sm font-medium">Turn Timer</span>
                             </div>
-                            
-                            <div class="flex items-center justify-between group">
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="eye-off" class="w-4 h-4 ${state.settings.blindImposter ? 'text-purple-400' : 'text-slate-500'}"></i>
-                                    <div>
-                                        <span class="text-slate-200 text-sm font-medium block">Blind Imposter</span>
-                                        <span class="text-slate-500 text-[10px] block">Hide category from Imposter</span>
-                                    </div>
-                                </div>
-                                <button onclick="toggleSetting('blindImposter')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.blindImposter ? 'bg-purple-600' : 'bg-slate-700'}">
-                                    <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.blindImposter ? 'translate-x-6' : 'translate-x-0'}"></div>
-                                </button>
-                            </div>
-
-                            <div class="flex items-center justify-between group">
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="flame" class="w-4 h-4 ${state.settings.punishments ? 'text-orange-400' : 'text-slate-500'}"></i>
-                                    <div>
-                                        <span class="text-slate-200 text-sm font-medium block">Party Punishments</span>
-                                        <span class="text-slate-500 text-[10px] block">Losers get a random dare</span>
-                                    </div>
-                                </div>
-                                <button onclick="toggleSetting('punishments')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.punishments ? 'bg-orange-600' : 'bg-slate-700'}">
-                                    <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.punishments ? 'translate-x-6' : 'translate-x-0'}"></div>
-                                </button>
-                            </div>
-
-                            <div class="flex items-center justify-between group">
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="sparkles" class="w-4 h-4 ${state.settings.wildcardRounds ? 'text-emerald-400' : 'text-slate-500'}"></i>
-                                    <div>
-                                        <span class="text-slate-200 text-sm font-medium block">Wildcard Rounds</span>
-                                        <span class="text-slate-500 text-[10px] block">Random goofy rule each game</span>
-                                    </div>
-                                </div>
-                                <button onclick="toggleSetting('wildcardRounds')" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.wildcardRounds ? 'bg-emerald-600' : 'bg-slate-700'}">
-                                    <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.wildcardRounds ? 'translate-x-6' : 'translate-x-0'}"></div>
-                                </button>
-                            </div>
-
-                            <div class="flex items-center justify-between group ${!canEnableJester ? 'opacity-50' : ''}">
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="smile" class="w-4 h-4 ${state.settings.jesterRole && canEnableJester ? 'text-fuchsia-400' : 'text-slate-500'}"></i>
-                                    <div>
-                                        <span class="text-slate-200 text-sm font-medium flex items-center">
-                                            Jester Role
-                                            ${!canEnableJester ? '<i data-lucide="lock" class="w-3 h-3 ml-1 text-slate-500"></i>' : ''}
-                                        </span>
-                                        <span class="text-slate-500 text-[10px] block">${!canEnableJester ? 'Requires 5+ players' : 'Act suspicious. Get voted to win.'}</span>
-                                    </div>
-                                </div>
-                                <button onclick="${canEnableJester ? "toggleSetting('jesterRole')" : ""}" class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${state.settings.jesterRole && canEnableJester ? 'bg-fuchsia-600' : 'bg-slate-700'} ${!canEnableJester ? 'cursor-not-allowed' : ''}">
-                                    <div class="w-4 h-4 bg-white rounded-full transition-transform ${state.settings.jesterRole && canEnableJester ? 'translate-x-6' : 'translate-x-0'}"></div>
-                                </button>
-                            </div>
-
-                            <div class="flex flex-col space-y-2 pt-2 border-t border-slate-700/50">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-2">
-                                        <i data-lucide="rotate-ccw" class="w-4 h-4 text-blue-400"></i>
-                                        <span class="text-slate-200 text-sm font-medium">Clues per Round</span>
-                                    </div>
-                                </div>
-                                <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                                    ${[1, 2, 3, 4, 5].map(num => `
-                                        <button onclick="updateSetting('clueRounds', ${num})" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.clueRounds === num ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
-                                            ${num}
-                                        </button>
-                                    `).join('')}
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col space-y-2">
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="timer" class="w-4 h-4 text-amber-400"></i>
-                                    <span class="text-slate-200 text-sm font-medium">Turn Timer</span>
-                                </div>
-                                <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
-                                    ${[{l: 'Off', v: 0}, {l: '5s', v: 5}, {l: '10s', v: 10}, {l: '15s', v: 15}].map(opt => `
-                                        <button onclick="updateSetting('timeLimit', ${opt.v})" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.timeLimit === opt.v ? 'bg-amber-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">
-                                            ${opt.l}
-                                        </button>
-                                    `).join('')}
-                                </div>
+                            <div class="flex bg-black/30 rounded-xl p-1 border border-slate-700/50">
+                                ${[{l:'Off',v:0},{l:'5s',v:5},{l:'10s',v:10},{l:'15s',v:15}].map(o => `
+                                    <button onclick="updateSetting('timeLimit',${o.v})" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${state.settings.timeLimit === o.v ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-slate-200'}">${o.l}</button>
+                                `).join('')}
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="shrink-0 mt-2">
-                    <button onclick="setScreen('categories')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex justify-center items-center">
-                        Choose Category <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
-                    </button>
-                </div>
-            `;
-        }
+            <div class="shrink-0 mt-2">
+                <button onclick="setScreen('categories')" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex justify-center items-center">
+                    Choose Category <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                </button>
+            </div>
+        `;
+    }
 
-        function renderCategoryItem(cat) {
-            const isPro = cat.type === 'pro';
-            const isCustom = cat.type === 'custom';
-            const bgClass = isPro 
-                ? 'bg-gradient-to-br from-[#1a1c29] to-[#2d2411] border border-amber-500/30 shadow-[0_4px_20px_rgba(245,158,11,0.05)]' 
+    // ─── Categories ───────────────────────────────────────────────────────────────
+    function renderCategoryCard(cat) {
+        const isPro      = cat.type === 'pro';
+        const isCustom   = cat.type === 'custom';
+        const isSelected = state.selectedCategories.includes(cat.name);
+
+        const bgClass = isSelected
+            ? 'bg-blue-600/30 border-blue-400/70 shadow-[0_0_12px_rgba(59,130,246,0.3)]'
+            : isPro
+                ? 'bg-gradient-to-br from-[#1a1c29] to-[#2d2411] border-amber-500/30'
                 : isCustom
-                ? 'bg-gradient-to-br from-[#1c1229] to-[#2d112b] border border-fuchsia-500/30 shadow-[0_4px_20px_rgba(217,70,239,0.05)]'
-                : 'glass-card border-blue-500/20 shadow-[0_4px_20px_rgba(59,130,246,0.05)]';
-            const dotClass = isPro ? 'bg-amber-400' : isCustom ? 'bg-fuchsia-400' : 'bg-blue-400';
+                    ? 'bg-gradient-to-br from-[#1c1229] to-[#2d112b] border-fuchsia-500/30'
+                    : 'glass-card border-blue-500/20';
 
-            return `
-                <button onclick="startGame('${cat.name}')" class="relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl aspect-[4/3] text-left transition-all active:scale-95 overflow-hidden group ${bgClass}">
-                    <div class="flex justify-between items-start relative z-10 w-full pr-6">
-                        <h3 class="text-white font-bold text-base sm:text-lg leading-tight w-full break-words">${cat.name}</h3>
-                        ${isPro ? `
-                            <div class="absolute top-0 right-0 bg-amber-500/20 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center space-x-1 border border-amber-500/50">
-                                <i data-lucide="sparkles" class="w-3 h-3"></i><span>PRO</span>
-                            </div>
-                        ` : ''}
-                        ${isCustom ? `
-                            <div onclick="editCustomCategory(${cat.id}, event)" class="absolute -top-1 -right-1 p-2 bg-fuchsia-500/20 text-fuchsia-300 hover:text-white hover:bg-fuchsia-500/60 rounded-full transition-all z-20 hover:scale-110">
-                                <i data-lucide="pencil" class="w-4 h-4"></i>
-                            </div>
-                        ` : ''}
-                    </div>
-                    <div class="flex items-center space-x-2 relative z-10 mt-auto pt-2">
+        const dotClass = isPro ? 'bg-amber-400' : isCustom ? 'bg-fuchsia-400' : 'bg-blue-400';
+
+        const editBtn = isCustom
+            ? `<button data-editid="${cat.id}" onclick="handleEditClick(this, event)" class="p-1.5 bg-fuchsia-500/20 text-fuchsia-300 hover:text-white hover:bg-fuchsia-500/60 rounded-full transition-all z-20">
+                   <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+               </button>`
+            : '';
+
+        return `
+            <div class="relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl aspect-[4/3] text-left overflow-hidden border ${bgClass} transition-all active:scale-95 cursor-pointer"
+                 data-catname="${esc(cat.name)}"
+                 onclick="handleCategoryClick(this)">
+                <div class="absolute top-2 right-2 z-20 pointer-events-none">
+                    <input type="checkbox" class="cat-checkbox" ${isSelected ? 'checked' : ''} readonly>
+                </div>
+                <div class="relative z-10 pr-6">
+                    <h3 class="text-white font-bold text-base sm:text-lg leading-tight break-words">${esc(cat.name)}</h3>
+                    ${isPro ? `
+                        <div class="mt-1 bg-amber-500/20 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded inline-flex items-center space-x-1 border border-amber-500/50">
+                            <i data-lucide="sparkles" class="w-3 h-3"></i><span>PRO</span>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="flex items-center justify-between relative z-10 mt-auto pt-2">
+                    <div class="flex items-center space-x-2">
                         <div class="w-2 h-2 rounded-full ${dotClass}"></div>
                         <span class="text-slate-300 text-xs font-medium">${cat.words} words</span>
                     </div>
+                    ${editBtn}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderCategories() {
+        const freeCats = Object.keys(WORD_DATABASE)
+            .filter(n => !['NFL QBs','Clash Royale','Anime','Superpowers'].includes(n))
+            .map(n => ({ name: n, words: WORD_DATABASE[n].length, type: 'free' }));
+        const proCats = ['NFL QBs','Clash Royale','Anime','Superpowers']
+            .map(n => ({ name: n, words: WORD_DATABASE[n].length, type: 'pro' }));
+
+        const selCount = state.selectedCategories.length;
+
+        return `
+            ${topBar('Select Category', true, 'goToSetup')}
+            <div class="shrink-0 mb-3 flex items-center justify-between glass-card rounded-2xl px-4 py-3 border border-slate-700/50">
+                <span class="text-sm font-semibold ${selCount > 0 ? 'text-blue-300' : 'text-slate-400'}">
+                    ${selCount === 0 ? 'Tap categories to select' : `${selCount} selected — random pick`}
+                </span>
+                ${selCount > 0 ? `<button onclick="clearCategorySelection()" class="text-xs text-slate-400 hover:text-white transition-colors">Clear</button>` : ''}
+            </div>
+            <div class="flex-1 overflow-y-auto pb-4 pr-1 custom-scrollbar space-y-6">
+                <div>
+                    <h2 class="text-blue-300 font-bold uppercase tracking-widest text-xs mb-3 px-1">Standard</h2>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">${freeCats.map(renderCategoryCard).join('')}</div>
+                </div>
+                <div>
+                    <h2 class="text-amber-400/80 font-bold uppercase tracking-widest text-xs mb-3 px-1 flex items-center space-x-1">
+                        <i data-lucide="sparkles" class="w-3 h-3"></i><span>Special &amp; Pop Culture</span>
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">${proCats.map(renderCategoryCard).join('')}</div>
+                </div>
+                <div>
+                    <h2 class="text-fuchsia-400/80 font-bold uppercase tracking-widest text-xs mb-3 px-1">Your Categories</h2>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                        ${state.customCategories.map(renderCategoryCard).join('')}
+                        <button onclick="openCreateCustom()" class="relative flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl aspect-[4/3] transition-all active:scale-95 glass-card border-dashed border-2 border-slate-600 hover:border-blue-400 hover:bg-blue-500/5 group">
+                            <div class="bg-slate-800 group-hover:bg-blue-500/20 p-2 sm:p-3 rounded-full mb-2 transition-colors">
+                                <i data-lucide="plus" class="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+                            </div>
+                            <span class="text-slate-300 font-bold text-xs sm:text-sm">Create New</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="shrink-0 mt-2">
+                <button onclick="startGameFromSelection()" ${selCount === 0 ? 'disabled' : ''}
+                    class="w-full py-4 rounded-2xl font-bold text-lg transition-all flex justify-center items-center
+                    ${selCount > 0
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white shadow-[0_0_20px_rgba(79,70,229,0.3)]'
+                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">
+                    ${selCount > 1 ? '<i data-lucide="shuffle" class="w-5 h-5 mr-2"></i>Play Random Pick' : selCount === 1 ? 'Play Selected' : 'Select a Category'}
+                </button>
+            </div>
+        `;
+    }
+
+    // ─── Create / Edit Custom ─────────────────────────────────────────────────────
+    function renderCreateCustom() {
+        const isEditing = !!state.customForm.id;
+        return `
+            ${topBar(isEditing ? 'Edit Category' : 'New Category', true, 'goToCategories')}
+            <div class="flex-1 overflow-y-auto pb-4 custom-scrollbar">
+                <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-6">
+                    ${state.customForm.error ? `
+                        <div class="bg-red-500/10 border border-red-500/50 p-3 rounded-xl flex items-start space-x-2 text-red-400 text-sm">
+                            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                            <span>${esc(state.customForm.error)}</span>
+                        </div>
+                    ` : ''}
+                    <div class="space-y-2">
+                        <label class="text-xs sm:text-sm font-bold text-blue-300 uppercase tracking-wider">Category Name</label>
+                        <input type="text" value="${esc(state.customForm.name)}" oninput="updateCustomForm('name', this.value)"
+                            placeholder="e.g. Marvel Characters"
+                            class="w-full bg-black/30 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-all placeholder:text-slate-600 font-medium">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs sm:text-sm font-bold text-blue-300 uppercase tracking-wider">Words</label>
+                        <p class="text-[10px] sm:text-xs text-slate-400 pb-1">
+                            Separate with commas. Optionally add a hint in brackets: <span class="text-blue-300 font-mono">Iron Man (Hero)</span>
+                        </p>
+                        <textarea oninput="updateCustomForm('wordsText', this.value)"
+                            placeholder="Iron Man (Hero), Thor (God), Hulk (Strong)..."
+                            class="w-full h-44 sm:h-52 bg-black/30 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-all resize-none placeholder:text-slate-600 leading-relaxed custom-scrollbar">${esc(state.customForm.wordsText)}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="shrink-0 mt-2 space-y-3">
+                <button onclick="saveCustomCategory()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center space-x-2 transition-all">
+                    <i data-lucide="check" class="w-5 h-5"></i><span>Save Category</span>
+                </button>
+                ${isEditing ? `
+                    <button onclick="openDeleteModal()" class="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 active:scale-95 text-red-400 border border-red-500/30 rounded-2xl font-bold text-base transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i><span>Delete Category</span>
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ─── Reveal ───────────────────────────────────────────────────────────────────
+    function renderReveal() {
+        const currentPlayer = state.players[state.game.currentPlayerIndex];
+        const isImposter    = state.game.imposterIds.includes(currentPlayer.id);
+        const isJester      = state.game.jesterId === currentPlayer.id;
+        const displayName   = currentPlayer.name.trim() || `Player ${state.game.currentPlayerIndex + 1}`;
+
+        let cardContent = '';
+        if (!state.game.roleRevealed) {
+            cardContent = `
+                <button onclick="revealRole()" class="w-full py-12 sm:py-14 bg-black/40 hover:bg-black/60 active:scale-95 rounded-2xl border-2 border-dashed border-slate-600 hover:border-blue-400 flex flex-col items-center justify-center space-y-4 transition-all group shadow-inner">
+                    <i data-lucide="eye" class="w-12 h-12 text-slate-500 group-hover:text-blue-400 transition-colors"></i>
+                    <span class="text-white font-bold text-lg sm:text-xl tracking-wide">Tap to Reveal Role</span>
                 </button>
             `;
-        }
-
-        function renderCategories() {
-            const freeCats = INITIAL_CATEGORIES.filter(c => c.type === 'free');
-            const proCats = INITIAL_CATEGORIES.filter(c => c.type === 'pro');
-            
-            return `
-                ${topBar('Select Category', true, 'goToSetup')}
-                <div class="flex-1 overflow-y-auto pb-4 pr-1 custom-scrollbar space-y-8">
-                    <div>
-                        <h2 class="text-blue-300 font-bold uppercase tracking-widest text-xs mb-3 px-1">Standard</h2>
-                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                            ${freeCats.map(renderCategoryItem).join('')}
+        } else if (isJester) {
+            cardContent = `
+                <div class="p-6 sm:p-8 rounded-3xl border bg-fuchsia-950/60 border-fuchsia-500/40 mb-6">
+                    <i data-lucide="smile" class="w-10 h-10 text-fuchsia-400 mx-auto mb-2 animate-pulse"></i>
+                    <h3 class="text-xl sm:text-2xl font-black text-fuchsia-400 uppercase tracking-widest">The Jester</h3>
+                    <div class="h-px w-16 bg-fuchsia-500/30 mx-auto my-4"></div>
+                    <div class="text-lg sm:text-xl font-bold text-white leading-tight">Act suspicious and get voted out to win the round!</div>
+                    ${state.settings.imposterHints && state.game.hint ? `
+                        <div class="mt-5 bg-fuchsia-500/10 border border-fuchsia-500/20 rounded-xl p-3">
+                            <p class="text-[10px] uppercase tracking-widest text-fuchsia-300/80 font-bold mb-0.5">Vague Hint</p>
+                            <p class="text-lg font-bold text-white">${esc(state.game.hint)}</p>
                         </div>
-                    </div>
-                    <div>
-                        <h2 class="text-amber-400/80 font-bold uppercase tracking-widest text-xs mb-3 px-1 flex items-center space-x-1">
-                            <i data-lucide="sparkles" class="w-3 h-3"></i><span>Special & Pop Culture</span>
-                        </h2>
-                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                            ${proCats.map(renderCategoryItem).join('')}
-                        </div>
-                    </div>
-                    <div>
-                        <h2 class="text-fuchsia-400/80 font-bold uppercase tracking-widest text-xs mb-3 px-1">Your Categories</h2>
-                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                            ${state.customCategories.map(renderCategoryItem).join('')}
-                            <button onclick="openCreateCustom()" class="relative flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl aspect-[4/3] transition-all active:scale-95 glass-card border-dashed border-2 border-slate-600 hover:border-blue-400 hover:bg-blue-500/5 group">
-                                <div class="bg-slate-800 group-hover:bg-blue-500/20 p-2 sm:p-3 rounded-full mb-2 transition-colors">
-                                    <i data-lucide="plus" class="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
-                                </div>
-                                <span class="text-slate-300 font-bold text-xs sm:text-sm">Create New</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderCreateCustom() {
-            const isEditing = !!state.customForm.id;
-            const title = isEditing ? 'Edit Category' : 'New Category';
-            
-            return `
-                ${topBar(title, true, 'goToCategories')}
-                <div class="flex-1 overflow-y-auto pb-4 custom-scrollbar">
-                    <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-6">
-                        ${state.customForm.error ? `
-                            <div class="bg-red-500/10 border border-red-500/50 p-3 rounded-xl flex items-start space-x-2 text-red-400 text-sm">
-                                <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
-                                <span>${state.customForm.error}</span>
-                            </div>
-                        ` : ''}
-                        <div class="space-y-2">
-                            <label class="text-xs sm:text-sm font-bold text-blue-300 uppercase tracking-wider">Category Name</label>
-                            <input type="text" value="${state.customForm.name}" oninput="updateCustomForm('name', this.value)" placeholder="e.g. Marvel Characters"
-                                class="w-full bg-black/30 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-slate-600 font-medium">
-                        </div>
-                        <div class="space-y-2 flex-1">
-                            <label class="text-xs sm:text-sm font-bold text-blue-300 uppercase tracking-wider">Words</label>
-                            <p class="text-[10px] sm:text-xs text-slate-400 pb-1">Separate words with commas</p>
-                            <textarea oninput="updateCustomForm('wordsText', this.value)" placeholder="Iron Man, Thor, Hulk..."
-                                class="w-full h-40 sm:h-48 bg-black/30 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none placeholder:text-slate-600 leading-relaxed custom-scrollbar">${state.customForm.wordsText}</textarea>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="shrink-0 mt-2 space-y-3">
-                    <button onclick="saveCustomCategory()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center space-x-2 transition-all">
-                        <i data-lucide="check" class="w-5 h-5"></i>
-                        <span>Save Category</span>
-                    </button>
-                    ${isEditing ? `
-                        <button onclick="openDeleteModal()" class="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 active:scale-95 text-red-400 border border-red-500/30 rounded-2xl font-bold text-base transition-all flex items-center justify-center space-x-2">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                            <span>Delete Category</span>
-                        </button>
                     ` : ''}
                 </div>
+                <button onclick="nextReveal()" class="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">Hide &amp; Next</button>
             `;
-        }
-
-        function renderReveal() {
-            const currentPlayer = state.players[state.game.currentPlayerIndex];
-            const isImposter = state.game.imposterIds.includes(currentPlayer.id);
-            const isJester = state.game.jesterId === currentPlayer.id;
-            const displayName = currentPlayer.name.trim() || `Player ${state.game.currentPlayerIndex + 1}`;
-
-            let cardContent = '';
-            if (!state.game.roleRevealed) {
-                cardContent = `
-                    <button onclick="revealRole()" class="w-full py-12 sm:py-14 bg-black/40 hover:bg-black/60 active:scale-95 rounded-2xl border-2 border-dashed border-slate-600 hover:border-blue-400 flex flex-col items-center justify-center space-y-4 transition-all group shadow-inner">
-                        <i data-lucide="eye" class="w-12 h-12 text-slate-500 group-hover:text-blue-400 transition-colors drop-shadow-lg"></i>
-                        <span class="text-white font-bold text-lg sm:text-xl tracking-wide group-hover:text-blue-100">Tap to Reveal Role</span>
-                    </button>
-                `;
-            } else {
-                if (isJester) {
-                    cardContent = `
-                        <div class="p-6 sm:p-8 rounded-3xl border backdrop-blur-md shadow-2xl bg-fuchsia-950/60 border-fuchsia-500/40 mb-6">
-                            <i data-lucide="smile" class="w-10 h-10 text-fuchsia-400 mx-auto mb-2 drop-shadow-[0_0_15px_rgba(217,70,239,0.4)] animate-pulse"></i>
-                            <h3 class="text-xl sm:text-2xl font-black text-fuchsia-400 uppercase tracking-widest drop-shadow-sm">The Jester</h3>
-                            <div class="h-px w-16 bg-fuchsia-500/30 mx-auto my-4"></div>
-                            <div>
-                                <p class="text-fuchsia-200/70 text-xs sm:text-sm font-medium">Your goal is different:</p>
-                                <div class="text-lg sm:text-xl font-bold text-white mt-3 leading-tight">Act suspicious and get voted out to win the round!</div>
-                            </div>
+        } else if (isImposter) {
+            cardContent = `
+                <div class="p-6 sm:p-8 rounded-3xl border bg-red-950/60 border-red-500/40 mb-6">
+                    <i data-lucide="${state.settings.blindImposter ? 'eye-off' : 'alert-circle'}" class="w-10 h-10 text-red-500 mx-auto mb-2 ${state.settings.blindImposter ? 'animate-pulse' : ''}"></i>
+                    <h3 class="text-xl sm:text-2xl font-black text-red-400 uppercase tracking-widest">Imposter</h3>
+                    <div class="h-px w-16 bg-red-500/30 mx-auto my-4"></div>
+                    ${state.settings.blindImposter
+                        ? `<div class="text-lg sm:text-xl font-bold text-white leading-tight">You don't know the category. Survive!</div>`
+                        : `<div>
+                               <p class="text-red-200/70 text-xs sm:text-sm font-medium">Blend in. The category is:</p>
+                               <div class="text-2xl sm:text-3xl font-black text-white mt-2 break-words">${esc(state.game.category)}</div>
+                           </div>`
+                    }
+                    ${state.settings.imposterHints && state.game.hint ? `
+                        <div class="mt-5 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+                            <p class="text-[10px] uppercase tracking-widest text-red-300/80 font-bold mb-0.5">Vague Hint</p>
+                            <p class="text-lg font-bold text-white">${esc(state.game.hint)}</p>
                         </div>
-                        <button onclick="nextReveal()" class="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">Hide & Next</button>
-                    `;
-                } else if (isImposter) {
-                    cardContent = `
-                        <div class="p-6 sm:p-8 rounded-3xl border backdrop-blur-md shadow-2xl bg-red-950/60 border-red-500/40 mb-6">
-                            <i data-lucide="${state.settings.blindImposter ? 'eye-off' : 'alert-circle'}" class="w-10 h-10 text-red-500 mx-auto mb-2 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)] ${state.settings.blindImposter ? 'animate-pulse' : ''}"></i>
-                            <h3 class="text-xl sm:text-2xl font-black text-red-400 uppercase tracking-widest drop-shadow-sm">Imposter</h3>
-                            <div class="h-px w-16 bg-red-500/30 mx-auto my-4"></div>
-                            ${state.settings.blindImposter ? `
-                                <div>
-                                    <p class="text-red-200/70 text-xs sm:text-sm font-medium uppercase tracking-widest bg-red-500/10 py-1 px-2 rounded-lg border border-red-500/20 inline-block">Blind Mode</p>
-                                    <div class="text-lg sm:text-xl font-bold text-white mt-3 leading-tight">You don't know the category. Survive!</div>
-                                </div>
-                            ` : `
-                                <div>
-                                    <p class="text-red-200/70 text-xs sm:text-sm font-medium">Blend in. The category is:</p>
-                                    <div class="text-2xl sm:text-3xl font-black text-white mt-2 tracking-wide break-words">${state.game.category}</div>
-                                </div>
-                            `}
-                        </div>
-                        <button onclick="nextReveal()" class="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">Hide & Next</button>
-                    `;
-                } else {
-                    cardContent = `
-                        <div class="p-6 sm:p-8 rounded-3xl border backdrop-blur-md shadow-2xl bg-blue-950/60 border-blue-500/40 mb-6">
-                            <i data-lucide="search" class="w-10 h-10 text-blue-400 mx-auto mb-2 drop-shadow-[0_0_15px_rgba(96,165,250,0.4)]"></i>
-                            <h3 class="text-base sm:text-lg font-bold text-blue-200/70 uppercase tracking-widest">Secret Word</h3>
-                            <div class="h-px w-16 bg-blue-500/30 mx-auto my-4"></div>
-                            <div class="text-3xl sm:text-4xl font-black text-white tracking-wide break-words">${state.game.secretWord}</div>
-                        </div>
-                        <button onclick="nextReveal()" class="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">Hide & Next</button>
-                    `;
-                }
-            }
-
-            return `
-                <div class="flex-1 flex flex-col items-center justify-center p-2 sm:p-4">
-                    <div class="w-full max-w-sm glass-card rounded-[2rem] p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden border border-slate-700/50">
-                        <div class="absolute -top-20 -right-20 w-48 h-48 bg-blue-500 rounded-full blur-[60px] opacity-10 pointer-events-none"></div>
-                        <h2 class="text-base sm:text-lg text-blue-200/60 font-semibold mb-2 tracking-wide uppercase">Pass phone to</h2>
-                        <h1 class="text-3xl sm:text-4xl font-black text-white mb-8 sm:mb-10 drop-shadow-md truncate">${displayName}</h1>
-                        ${cardContent}
-                    </div>
+                    ` : ''}
                 </div>
+                <button onclick="nextReveal()" class="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">Hide &amp; Next</button>
+            `;
+        } else {
+            cardContent = `
+                <div class="p-6 sm:p-8 rounded-3xl border bg-blue-950/60 border-blue-500/40 mb-6">
+                    <i data-lucide="search" class="w-10 h-10 text-blue-400 mx-auto mb-2"></i>
+                    <h3 class="text-base sm:text-lg font-bold text-blue-200/70 uppercase tracking-widest">Secret Word</h3>
+                    <div class="h-px w-16 bg-blue-500/30 mx-auto my-4"></div>
+                    <div class="text-3xl sm:text-4xl font-black text-white tracking-wide break-words">${esc(state.game.secretWord)}</div>
+                </div>
+                <button onclick="nextReveal()" class="w-full py-4 bg-white hover:bg-slate-200 active:scale-95 text-slate-900 rounded-xl font-bold text-lg shadow-xl transition-all">Hide &amp; Next</button>
             `;
         }
 
-        function renderPlaying() {
-            const totalTurns = state.game.shuffledPlayers.length * state.settings.clueRounds;
-            const isGameOver = state.game.activeTurnIndex >= totalTurns;
-            
-            if (isGameOver) {
-                return `
-                    ${topBar('Give Clues', false)}
-                    <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6 pb-4">
-                        <div class="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30 mb-4">
-                            <i data-lucide="swords" class="w-12 h-12 text-red-400"></i>
-                        </div>
-                        <h2 class="text-4xl font-black text-white drop-shadow-md">All Clues Given</h2>
-                        <p class="text-slate-300 px-4 text-lg">It's time to interrogate and vote.</p>
-                    </div>
-                    
-                    <div class="shrink-0 mt-2">
-                        <button onclick="setScreen('voting')" class="w-full py-5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(225,29,72,0.3)] transition-all">Start Voting</button>
-                    </div>
-                `;
-            }
+        return `
+            <div class="flex-1 flex flex-col items-center justify-center p-2 sm:p-4">
+                <div class="w-full max-w-sm glass-card rounded-[2rem] p-6 sm:p-8 text-center shadow-2xl border border-slate-700/50 overflow-hidden relative">
+                    <div class="absolute -top-20 -right-20 w-48 h-48 bg-blue-500 rounded-full blur-[60px] opacity-10 pointer-events-none"></div>
+                    <h2 class="text-base sm:text-lg text-blue-200/60 font-semibold mb-2 uppercase tracking-wide">Pass phone to</h2>
+                    <h1 class="text-3xl sm:text-4xl font-black text-white mb-8 sm:mb-10 truncate">${esc(displayName)}</h1>
+                    ${cardContent}
+                </div>
+            </div>
+        `;
+    }
 
-            const activePlayer = state.game.shuffledPlayers[state.game.activeTurnIndex % state.game.shuffledPlayers.length];
-            const currentRound = Math.floor(state.game.activeTurnIndex / state.game.shuffledPlayers.length) + 1;
-            const timerWarning = state.settings.timeLimit > 0 && state.game.timeLeft <= 3 && state.game.timeLeft > 0;
-            const timerFailed = state.settings.timeLimit > 0 && state.game.timeLeft === 0;
+    // ─── Playing ──────────────────────────────────────────────────────────────────
+    function renderPlaying() {
+        const totalTurns = state.game.shuffledPlayers.length * state.settings.clueRounds;
 
-            const bgClass = timerWarning ? 'border-amber-500/50 bg-amber-950/30' : timerFailed ? 'border-red-500/50 bg-red-950/40' : 'border-blue-500/30';
-            const nameColor = timerWarning ? 'text-amber-400' : timerFailed ? 'text-red-400' : 'text-white';
-            
-            let timerHTML = '';
-            if (state.settings.timeLimit > 0) {
-                const timerCircleColor = timerWarning ? 'border-amber-500/50 text-amber-400 bg-amber-500/10' : timerFailed ? 'border-red-500/50 text-red-500 bg-red-500/10' : 'border-blue-500/30 text-blue-300 bg-black/20';
-                const pulseClass = timerWarning ? 'animate-pulse-fast' : '';
-                
-                timerHTML = `
-                    <div class="flex flex-col items-center justify-center mb-6">
-                        <div id="turn-timer-circle" class="w-24 h-24 rounded-full border-4 flex items-center justify-center shadow-inner transition-colors duration-300 ${timerCircleColor} ${pulseClass}">
-                            <span id="turn-timer-text" class="text-4xl font-black font-mono tracking-tighter">${state.game.timeLeft}</span>
-                        </div>
-                        ${timerFailed ? `<span class="text-red-400 font-bold mt-3 text-sm">TIME'S UP!</span>` : ''}
-                    </div>
-                `;
-            }
-
+        if (state.game.activeTurnIndex >= totalTurns) {
             return `
                 ${topBar('Give Clues', false)}
-                <div class="flex-1 flex flex-col min-h-0 space-y-4 pb-4">
-                    
-                    ${state.game.activeWildcard ? `
-                        <div class="glass-card rounded-2xl p-4 text-center shrink-0 border border-emerald-500/30 bg-emerald-950/20 shadow-lg flex flex-col items-center justify-center">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400 animate-pulse"></i>
-                                <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Wildcard Rule</span>
-                            </div>
-                            <span class="text-white font-medium text-sm px-2">${state.game.activeWildcard}</span>
-                        </div>
-                    ` : `
-                        <div class="glass-card rounded-2xl p-4 text-center shrink-0 border border-slate-700/50 flex justify-between items-center bg-indigo-900/10">
-                            <div class="text-left">
-                                <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Phase</span>
-                                <span class="text-white font-medium text-sm">Say 1 word</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Round</span>
-                                <span class="text-white font-medium text-sm">${currentRound} of ${state.settings.clueRounds}</span>
-                            </div>
-                        </div>
-                    `}
-
-                    <div id="playing-dashboard" class="glass-card rounded-[2rem] p-6 sm:p-8 text-center border relative overflow-hidden flex-1 flex flex-col justify-center shadow-xl transition-colors duration-300 ${bgClass}">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
-                        <div class="mb-4 text-slate-400 font-medium uppercase tracking-widest text-sm">Speaking Now</div>
-                        <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-8 truncate drop-shadow-md ${nameColor}">${activePlayer.name.trim() || 'Player'}</h2>
-                        ${timerHTML}
+                <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6 pb-4">
+                    <div class="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30">
+                        <i data-lucide="swords" class="w-12 h-12 text-red-400"></i>
                     </div>
+                    <h2 class="text-4xl font-black text-white">All Clues Given</h2>
+                    <p class="text-slate-300 px-4 text-lg">It's time to interrogate and vote.</p>
                 </div>
-
                 <div class="shrink-0 mt-2">
-                    <button onclick="advanceTurn()" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center transition-all">
-                        Next Player
+                    <button onclick="setScreen('voting')" class="w-full py-5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(225,29,72,0.3)] transition-all">Start Voting</button>
+                </div>
+            `;
+        }
+
+        const activePlayer  = state.game.shuffledPlayers[state.game.activeTurnIndex % state.game.shuffledPlayers.length];
+        const currentRound  = Math.floor(state.game.activeTurnIndex / state.game.shuffledPlayers.length) + 1;
+        const timerOn       = state.settings.timeLimit > 0;
+        const timerWarning  = timerOn && state.game.timeLeft <= 3 && state.game.timeLeft > 0;
+        const timerFailed   = timerOn && state.game.timeLeft === 0;
+        const borderClass   = timerWarning ? 'border-amber-500/50 bg-amber-950/30' : timerFailed ? 'border-red-500/50 bg-red-950/40' : 'border-blue-500/30';
+        const nameColor     = timerWarning ? 'text-amber-400' : timerFailed ? 'text-red-400' : 'text-white';
+
+        let timerHTML = '';
+        if (timerOn) {
+            const tc = timerWarning ? 'border-amber-500/50 text-amber-400 bg-amber-500/10' : timerFailed ? 'border-red-500/50 text-red-500 bg-red-500/10' : 'border-blue-500/30 text-blue-300 bg-black/20';
+            timerHTML = `
+                <div class="flex flex-col items-center justify-center mb-6">
+                    <div id="turn-timer-circle" class="w-24 h-24 rounded-full border-4 flex items-center justify-center shadow-inner transition-colors duration-300 ${tc} ${timerWarning ? 'animate-pulse-fast' : ''}">
+                        <span id="turn-timer-text" class="text-4xl font-black font-mono">${state.game.timeLeft}</span>
+                    </div>
+                    ${timerFailed ? `<span class="text-red-400 font-bold mt-3 text-sm">TIME'S UP!</span>` : ''}
+                </div>
+            `;
+        }
+
+        return `
+            ${topBar('Give Clues', false)}
+            <div class="flex-1 flex flex-col min-h-0 space-y-4 pb-4">
+                ${state.game.activeWildcard ? `
+                    <div class="glass-card rounded-2xl p-4 text-center shrink-0 border border-emerald-500/30 bg-emerald-950/20 flex flex-col items-center">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400 animate-pulse"></i>
+                            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Wildcard Rule</span>
+                        </div>
+                        <span class="text-white font-medium text-sm px-2">${esc(state.game.activeWildcard)}</span>
+                    </div>
+                ` : `
+                    <div class="glass-card rounded-2xl p-4 shrink-0 border border-slate-700/50 flex justify-between items-center bg-indigo-900/10">
+                        <div class="text-left">
+                            <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Phase</span>
+                            <span class="text-white font-medium text-sm">Say 1 word</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-indigo-300 font-bold uppercase tracking-widest block">Round</span>
+                            <span class="text-white font-medium text-sm">${currentRound} of ${state.settings.clueRounds}</span>
+                        </div>
+                    </div>
+                `}
+                <div id="playing-dashboard" class="glass-card rounded-[2rem] p-6 sm:p-8 text-center border relative overflow-hidden flex-1 flex flex-col justify-center shadow-xl transition-colors duration-300 ${borderClass}">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
+                    <div class="mb-4 text-slate-400 font-medium uppercase tracking-widest text-sm">Speaking Now</div>
+                    <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-8 truncate ${nameColor}">${esc(activePlayer.name.trim() || 'Player')}</h2>
+                    ${timerHTML}
+                </div>
+            </div>
+            <div class="shrink-0 mt-2">
+                <button onclick="advanceTurn()" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all">Next Player</button>
+            </div>
+        `;
+    }
+
+    // ─── Voting ───────────────────────────────────────────────────────────────────
+    function renderVoting() {
+        return `
+            ${topBar('Vote Imposter', false)}
+            <div class="text-center mb-4 bg-blue-900/10 py-3 rounded-2xl border border-blue-500/10 shrink-0">
+                <p class="text-blue-200/80 font-medium text-sm sm:text-base">Discuss. Who will you execute?</p>
+            </div>
+            <div class="space-y-3 flex-1 overflow-y-auto pb-4 custom-scrollbar">
+                ${state.players.map(p => `
+                    <button onclick="openVoteModal(${p.id})" class="w-full flex items-center justify-between p-4 sm:p-5 glass-card hover:bg-white/10 active:scale-95 rounded-2xl transition-all border border-slate-700/50 group">
+                        <span class="text-white font-bold text-lg sm:text-xl group-hover:text-blue-200 truncate">${esc(p.name.trim() || 'Player')}</span>
+                        <div class="w-6 h-6 rounded-full border-2 border-slate-500 group-hover:border-blue-400 transition-colors shrink-0"></div>
                     </button>
-                </div>
-            `;
-        }
+                `).join('')}
+            </div>
+        `;
+    }
 
-        function renderVoting() {
+    // ─── Result ───────────────────────────────────────────────────────────────────
+    function renderResult() {
+        const { winner, imposterIds, jesterId, lastVotedId, earnings } = state.game;
+        const imposters     = state.players.filter(p => imposterIds.includes(p.id));
+        const imposterNames = imposters.map(p => esc(p.name.trim() || 'Player')).join(' &amp; ');
+        const suspect       = state.players.find(p => p.id === lastVotedId);
+        const suspectName   = suspect ? esc(suspect.name.trim() || 'Player') : 'Someone';
+
+        const headers = {
+            jester:   { glow:'fuchsia', icon:'smile',        iconColor:'fuchsia-400', title:'Jester Wins!',      sub:`You fools executed <span class="text-white font-bold">${suspectName}</span>!` },
+            players:  { glow:'blue',    icon:'trophy',       iconColor:'blue-400',    title:'Imposter Caught!',  sub:`The crew executed <span class="text-white font-bold">${suspectName}</span>.` },
+            imposter: { glow:'red',     icon:'alert-circle', iconColor:'red-500',     title:'Imposter Escaped!', sub:`You executed <span class="text-white font-bold">${suspectName}</span> (Innocent).<br><span class="text-sm font-bold text-red-400 mt-1 inline-block">The Imposter was <span class="text-white text-lg">${imposterNames}</span></span>` }
+        };
+        const h = headers[winner] || headers.imposter;
+
+        const sortedByEarnings = [...state.players].sort((a,b) => (earnings[b.id]||0) - (earnings[a.id]||0));
+        const earningsRows = sortedByEarnings.map(p => {
+            const earned = earnings[p.id] || 0;
+            const colorClass = earned > 0 ? 'text-emerald-400' : earned < 0 ? 'text-red-400' : 'text-slate-400';
+            const sign = earned > 0 ? '+' : '';
+            let roleTag = '';
+            if (imposterIds.includes(p.id)) roleTag = '<span class="text-[10px] ml-2 px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 uppercase font-bold">Imposter</span>';
+            else if (jesterId === p.id)     roleTag = '<span class="text-[10px] ml-2 px-1.5 py-0.5 rounded bg-fuchsia-500/20 text-fuchsia-400 border border-fuchsia-500/30 uppercase font-bold">Jester</span>';
             return `
-                ${topBar('Vote Imposter', false)}
-                <div class="text-center mb-4 sm:mb-6 bg-blue-900/10 py-3 rounded-2xl border border-blue-500/10 shrink-0">
-                    <p class="text-blue-200/80 font-medium text-sm sm:text-base">Discuss. Who will you execute?</p>
-                </div>
-                <div class="space-y-3 flex-1 overflow-y-auto pb-4 custom-scrollbar relative">
-                    ${state.players.map(player => `
-                        <button onclick="openVoteModal(${player.id})" class="w-full flex items-center justify-between p-4 sm:p-5 glass-card hover:bg-white/10 active:scale-95 rounded-2xl transition-all border border-slate-700/50 group">
-                            <span class="text-white font-bold text-lg sm:text-xl group-hover:text-blue-200 transition-colors truncate">${player.name.trim() || 'Player'}</span>
-                            <div class="w-6 h-6 rounded-full border-2 border-slate-500 group-hover:border-blue-400 transition-colors shrink-0"></div>
-                        </button>
-                    `).join('')}
+                <div class="flex justify-between items-center bg-black/20 rounded-lg p-2.5 px-3">
+                    <div class="flex items-center flex-wrap"><span class="text-white text-sm font-medium">${esc(p.name)}</span>${roleTag}</div>
+                    <span class="${colorClass} font-black text-sm w-8 text-right">${sign}${earned}</span>
                 </div>
             `;
-        }
+        }).join('');
 
-        function renderResult() {
-            const isPlayersWin = state.game.winner === 'players';
-            const isJesterWin = state.game.winner === 'jester';
-            const isImposterWin = state.game.winner === 'imposter';
-            
-            const imposters = state.players.filter(p => state.game.imposterIds.includes(p.id));
-            const imposterNames = imposters.map(p => p.name.trim() || 'Player').join(' & ');
-            
-            const suspect = state.players.find(p => p.id === state.game.lastVotedId);
-            const suspectName = suspect ? (suspect.name.trim() || 'Player') : 'Someone';
-            
-            let headerHTML = '';
-            
-            if (isJesterWin) {
-                headerHTML = `
-                    <div class="space-y-4 text-center pt-8">
-                        <div class="inline-block relative group">
-                            <div class="absolute inset-0 blur-[50px] opacity-40 rounded-full bg-fuchsia-500"></div>
-                            <div class="relative p-6 sm:p-8 rounded-full bg-fuchsia-500/20 border-fuchsia-500/50 border-2">
-                                <i data-lucide="smile" class="w-16 h-16 sm:w-20 sm:h-20 text-fuchsia-400 drop-shadow-[0_0_15px_rgba(217,70,239,0.5)]"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <h1 class="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 text-fuchsia-400 drop-shadow-lg">Jester Wins!</h1>
-                            <p class="text-base sm:text-lg text-fuchsia-200/90 mt-2 font-medium">You fools executed <span class="text-white font-bold">${suspectName}</span>!</p>
+        const leaderboardRows = [...state.players].sort((a,b) => b.score - a.score).map((p, i) => `
+            <div class="flex justify-between items-center bg-black/20 rounded-lg p-2.5 px-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-slate-500 text-xs font-bold w-4">${i+1}.</span>
+                    <span class="text-white text-sm font-medium">${esc(p.name)}</span>
+                </div>
+                <span class="${p.score < 0 ? 'text-red-400' : 'text-blue-400'} font-bold text-sm">${p.score} pt${Math.abs(p.score) !== 1 ? 's' : ''}</span>
+            </div>
+        `).join('');
+
+        const champion = state.players.find(p => p.score >= state.settings.scoreLimit);
+        const primaryBtnAction = champion ? 'showSeriesWinner()' : 'playNextRound()';
+        const primaryBtnText   = champion ? 'View Champion' : 'Next Round';
+        const primaryBtnClass  = champion
+            ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+            : 'bg-white text-slate-900 hover:bg-slate-200';
+
+        return `
+            <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center py-4 space-y-6 relative z-10">
+                <div class="absolute top-0 right-0 glass-card px-3 py-1.5 rounded-full border border-slate-700/50 flex space-x-2 items-center">
+                    <i data-lucide="list-ordered" class="w-4 h-4 text-slate-400"></i>
+                    <span class="text-xs font-bold text-slate-300">Target: ${state.settings.scoreLimit} Wins</span>
+                </div>
+                <div class="space-y-4 text-center pt-8 w-full max-w-sm">
+                    <div class="inline-block relative">
+                        <div class="absolute inset-0 blur-[50px] opacity-40 rounded-full bg-${h.glow}-500"></div>
+                        <div class="relative p-6 sm:p-8 rounded-full bg-${h.glow}-500/20 border-${h.glow}-500/50 border-2">
+                            <i data-lucide="${h.icon}" class="w-16 h-16 sm:w-20 sm:h-20 text-${h.iconColor}"></i>
                         </div>
                     </div>
-                `;
-            } else if (isPlayersWin) {
-                headerHTML = `
-                    <div class="space-y-4 text-center pt-8">
-                        <div class="inline-block relative group">
-                            <div class="absolute inset-0 blur-[50px] opacity-40 rounded-full bg-blue-500"></div>
-                            <div class="relative p-6 sm:p-8 rounded-full bg-blue-500/20 border-blue-500/50 border-2">
-                                <i data-lucide="trophy" class="w-16 h-16 sm:w-20 sm:h-20 text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <h1 class="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 text-blue-400 drop-shadow-lg">Imposter Caught!</h1>
-                            <p class="text-base sm:text-lg text-blue-200/90 mt-2 font-medium">The crew successfully executed <span class="text-white font-bold">${suspectName}</span>.</p>
-                        </div>
+                    <div>
+                        <h1 class="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 text-${h.glow === 'fuchsia' ? 'fuchsia' : h.glow === 'blue' ? 'blue' : 'red'}-${h.glow === 'red' ? '500' : '400'}">${h.title}</h1>
+                        <p class="text-base sm:text-lg mt-2 font-medium text-slate-200">${h.sub}</p>
                     </div>
-                `;
-            } else {
-                headerHTML = `
-                    <div class="space-y-4 text-center pt-8">
-                        <div class="inline-block relative group">
-                            <div class="absolute inset-0 blur-[50px] opacity-40 rounded-full bg-red-500"></div>
-                            <div class="relative p-6 sm:p-8 rounded-full bg-red-500/20 border-red-500/50 border-2">
-                                <i data-lucide="alert-circle" class="w-16 h-16 sm:w-20 sm:h-20 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <h1 class="text-4xl sm:text-5xl font-black uppercase tracking-tight mb-2 text-red-500 drop-shadow-lg">Imposter Escaped!</h1>
-                            <p class="text-base sm:text-lg text-red-200/90 mt-2 font-medium">You executed <span class="text-white font-bold">${suspectName}</span> (Innocent).</p>
-                            <p class="text-sm font-bold text-red-400 mt-2">The Imposter was <span class="text-white text-lg">${imposterNames}</span></p>
-                        </div>
+                </div>
+                <div class="w-full max-w-sm glass-card rounded-2xl p-4 border border-slate-700/50">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3">Round Points</p>
+                    <div class="space-y-1.5">${earningsRows}</div>
+                </div>
+                <div class="glass-card rounded-3xl p-6 sm:p-8 w-full max-w-sm space-y-5 border border-slate-700/50 shadow-2xl relative overflow-hidden ${winner === 'jester' ? 'opacity-70' : ''}">
+                    <div class="text-center">
+                        <p class="text-blue-300 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">Category</p>
+                        <p class="text-white text-lg sm:text-xl font-medium">${esc(state.game.category)}</p>
                     </div>
-                `;
-            }
-
-            const sortedPlayers = [...state.players].sort((a,b) => (state.game.earnings[b.id] || 0) - (state.game.earnings[a.id] || 0));
-            
-            const earningsHTML = sortedPlayers.map(p => {
-                const earned = state.game.earnings[p.id] || 0;
-                let colorClass = 'text-slate-400';
-                let sign = '';
-                if (earned > 0) { colorClass = 'text-emerald-400'; sign = '+'; }
-                if (earned < 0) { colorClass = 'text-red-400'; }
-                
-                let roleTag = '';
-                if (state.game.imposterIds.includes(p.id)) {
-                    roleTag = '<span class="text-[10px] ml-2 px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 uppercase tracking-wider font-bold">Imposter</span>';
-                } else if (state.game.jesterId === p.id) {
-                    roleTag = '<span class="text-[10px] ml-2 px-1.5 py-0.5 rounded bg-fuchsia-500/20 text-fuchsia-400 border border-fuchsia-500/30 uppercase tracking-wider font-bold">Jester</span>';
-                }
-
-                return `
-                    <div class="flex justify-between items-center bg-black/20 rounded-lg p-2.5 px-3">
-                        <div class="flex items-center">
-                            <span class="text-white text-sm font-medium">${p.name}</span>
-                            ${roleTag}
-                        </div>
-                        <span class="${colorClass} font-black text-sm w-8 text-right">${sign}${earned}</span>
+                    <div class="h-px bg-slate-800 w-full"></div>
+                    <div class="text-center">
+                        <p class="text-blue-300 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">Secret Word</p>
+                        <p class="text-white text-2xl sm:text-3xl font-black tracking-wide">${esc(state.game.secretWord)}</p>
                     </div>
-                `;
-            }).join('');
-
-            let punishmentHTML = '';
-            if (state.settings.punishments && state.game.currentPunishment && state.game.punishedPlayer) {
-                punishmentHTML = `
-                    <div class="glass-card rounded-2xl p-4 mt-4 border border-orange-500/30 bg-orange-950/20 shadow-lg w-full max-w-sm shrink-0">
+                </div>
+                ${state.settings.punishments && state.game.currentPunishment && state.game.punishedPlayer ? `
+                    <div class="glass-card rounded-2xl p-4 border border-orange-500/30 bg-orange-950/20 w-full max-w-sm">
                         <div class="flex items-center space-x-2 justify-center mb-2">
                             <i data-lucide="flame" class="w-5 h-5 text-orange-400"></i>
                             <span class="text-orange-300 font-bold uppercase text-xs tracking-widest">Punishment Time</span>
                         </div>
-                        <p class="text-white text-center font-medium leading-tight px-2 text-sm">
-                            <span class="text-orange-400 font-bold">${state.game.punishedPlayer}</span>: ${state.game.currentPunishment}
+                        <p class="text-white text-center font-medium text-sm px-2">
+                            <span class="text-orange-400 font-bold">${esc(state.game.punishedPlayer)}</span>: ${esc(state.game.currentPunishment)}
                         </p>
                     </div>
-                `;
-            }
-
-            const champion = state.players.find(p => p.score >= state.settings.scoreLimit);
-            const primaryBtnAction = champion ? 'showSeriesWinner()' : 'playNextRound()';
-            const primaryBtnText = champion ? 'View Champion' : 'Next Round';
-            const primaryBtnClass = champion ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-white text-slate-900 hover:bg-slate-200';
-
-            return `
-                <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center py-4 space-y-6 sm:space-y-8 relative z-10">
-                    
-                    <div class="absolute top-0 right-0 sm:right-4 glass-card px-3 py-1.5 rounded-full border border-slate-700/50 flex space-x-3 items-center">
-                        <i data-lucide="list-ordered" class="w-4 h-4 text-slate-400"></i>
-                        <span class="text-xs font-bold text-slate-300">Target: ${state.settings.scoreLimit} Wins</span>
-                    </div>
-
-                    ${headerHTML}
-
-                    <!-- Explicit Breakdown per Player -->
-                    <div class="w-full max-w-sm glass-card rounded-2xl p-4 border border-slate-700/50 shrink-0">
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3 text-left">Round Points</p>
-                        <div class="space-y-1.5">
-                            ${earningsHTML}
-                        </div>
-                    </div>
-
-                    <!-- Only show the secret word if Jester DID NOT win, or show it anyway but smaller -->
-                    <div class="glass-card rounded-3xl p-6 sm:p-8 w-full max-w-sm space-y-5 border border-slate-700/50 shadow-2xl relative overflow-hidden shrink-0 ${isJesterWin ? 'opacity-70' : ''}">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-slate-500/30 to-transparent"></div>
-                        <div class="text-center">
-                            <p class="text-blue-300 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">Category</p>
-                            <p class="text-white text-lg sm:text-xl font-medium">${state.game.category}</p>
-                        </div>
-                        <div class="h-px bg-slate-800 w-full"></div>
-                        <div class="text-center">
-                            <p class="text-blue-300 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">Secret Word</p>
-                            <p class="text-white text-2xl sm:text-3xl font-black tracking-wide">${state.game.secretWord}</p>
-                        </div>
-                    </div>
-
-                    ${punishmentHTML}
-
-                    <!-- Total Overall Leaderboard -->
-                    <div class="w-full max-w-sm glass-card rounded-2xl p-4 border border-slate-700/50 shrink-0">
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3 text-left">Total Leaderboard</p>
-                        <div class="space-y-1.5">
-                            ${[...state.players].sort((a,b)=>b.score - a.score).map((p, i) => `
-                                <div class="flex justify-between items-center bg-black/20 rounded-lg p-2.5 px-3">
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-slate-500 text-xs font-bold w-4">${i+1}.</span>
-                                        <span class="text-white text-sm font-medium">${p.name}</span>
-                                    </div>
-                                    <span class="${p.score < 0 ? 'text-red-400' : 'text-blue-400'} font-bold text-sm">${p.score} pt${p.score !== 1 && p.score !== -1 ? 's' : ''}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
+                ` : ''}
+                <div class="w-full max-w-sm glass-card rounded-2xl p-4 border border-slate-700/50">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3">Total Leaderboard</p>
+                    <div class="space-y-1.5">${leaderboardRows}</div>
                 </div>
+            </div>
+            <div class="shrink-0 mt-4 flex w-full max-w-sm mx-auto space-x-3">
+                <button onclick="setScreen('setup')" class="flex-1 py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-bold transition-all">Setup</button>
+                <button onclick="${primaryBtnAction}" class="flex-[2] py-4 ${primaryBtnClass} active:scale-95 rounded-2xl font-black text-lg shadow-xl transition-all">${primaryBtnText}</button>
+            </div>
+        `;
+    }
 
-                <!-- Bottom Fixed Action Buttons -->
-                <div class="shrink-0 mt-4 flex w-full max-w-sm mx-auto space-x-3">
-                    <button onclick="setScreen('setup')" class="flex-1 py-4 glass-card hover:bg-white/10 active:scale-95 text-white rounded-2xl font-bold transition-all">Setup</button>
-                    <button onclick="${primaryBtnAction}" class="flex-[2] py-4 ${primaryBtnClass} active:scale-95 rounded-2xl font-black text-lg shadow-xl transition-all flex items-center justify-center">${primaryBtnText}</button>
-                </div>
-            `;
-        }
+    // ─── Actions ──────────────────────────────────────────────────────────────────
+    function setScreen(name) { state.screen = name; render(); }
+    function goToHome()       { setScreen('home'); }
+    function goToSetup()      { setScreen('setup'); }
+    function goToCategories() { setScreen('categories'); }
 
-        // --- Actions ---
-        function setScreen(screenName) {
-            state.screen = screenName;
+    function addPlayer() {
+        if (state.players.length < 12) {
+            state.players.push({ id: Date.now(), name: `Player ${state.players.length + 1}`, score: 0 });
             render();
         }
+    }
 
-        function goToHome() { setScreen('home'); }
-        function goToSetup() { setScreen('setup'); }
-        function goToCategories() { setScreen('categories'); }
-
-        function addPlayer() {
-            if (state.players.length < 12) {
-                state.players.push({ id: Date.now(), name: `Player ${state.players.length + 1}`, score: 0 });
-                render();
-            }
-        }
-
-        function removePlayer(id) {
-            if (state.players.length > 3) {
-                state.players = state.players.filter(p => p.id !== id);
-                if (state.players.length < 5) {
-                    state.settings.jesterRole = false;
-                }
-                render();
-            }
-        }
-
-        function updatePlayerName(id, name) {
-            const player = state.players.find(p => p.id === id);
-            if (player) player.name = name;
-        }
-
-        function updateImposterCount(delta) {
-            const newCount = state.imposterCount + delta;
-            const max = Math.max(1, state.players.length - 2);
-            if (newCount >= 1 && newCount <= max) {
-                state.imposterCount = newCount;
-                render();
-            }
-        }
-
-        function updateSetting(key, val) {
-            state.settings[key] = val;
+    function removePlayer(id) {
+        if (state.players.length > 3) {
+            state.players = state.players.filter(p => p.id !== id);
+            if (state.players.length < 5) state.settings.jesterRole = false;
             render();
         }
+    }
 
-        function toggleSetting(key) {
-            state.settings[key] = !state.settings[key];
-            render();
+    function updatePlayerName(id, name) {
+        const p = state.players.find(p => p.id === id);
+        if (p) p.name = name;
+    }
+
+    function updateImposterCount(delta) {
+        const next = state.imposterCount + delta;
+        const max  = Math.max(1, state.players.length - 2);
+        if (next >= 1 && next <= max) { state.imposterCount = next; render(); }
+    }
+
+    function updateSetting(key, val) { state.settings[key] = val; render(); }
+    function toggleSetting(key)      { state.settings[key] = !state.settings[key]; render(); }
+
+    // ─── Category Selection ───────────────────────────────────────────────────────
+    function handleCategoryClick(el) {
+        const name = el.dataset.catname;
+        if (!name) return;
+        const idx = state.selectedCategories.indexOf(name);
+        if (idx === -1) state.selectedCategories.push(name);
+        else state.selectedCategories.splice(idx, 1);
+        render();
+    }
+
+    function handleEditClick(btn, event) {
+        event.stopPropagation();
+        const id = Number(btn.dataset.editid);
+        const cat = state.customCategories.find(c => c.id === id);
+        if (!cat) return;
+        const wordsText = cat.wordList.map((w, i) => {
+            const hint = cat.hintList && cat.hintList[i];
+            return hint ? `${w} (${hint})` : w;
+        }).join(', ');
+        state.customForm = { id: cat.id, name: cat.name, wordsText, error: '' };
+        setScreen('createCustom');
+    }
+
+    function clearCategorySelection() { state.selectedCategories = []; render(); }
+
+    function startGameFromSelection() {
+        if (state.selectedCategories.length === 0) return;
+        const pick = state.selectedCategories[Math.floor(Math.random() * state.selectedCategories.length)];
+        startGame(pick);
+    }
+
+    // ─── Custom Category CRUD ─────────────────────────────────────────────────────
+    function openCreateCustom() {
+        state.customForm = { id: null, name: '', wordsText: '', error: '' };
+        setScreen('createCustom');
+    }
+
+    function updateCustomForm(field, value) {
+        state.customForm[field] = value;
+        state.customForm.error = '';
+    }
+
+    function saveCustomCategory() {
+        const name = state.customForm.name.trim();
+        if (!name) { state.customForm.error = 'Category name cannot be empty.'; return render(); }
+        const isDupStandard = Object.keys(WORD_DATABASE).some(n => n.toLowerCase() === name.toLowerCase());
+        const isDupCustom   = state.customCategories.some(c => c.name.toLowerCase() === name.toLowerCase() && c.id !== state.customForm.id);
+        if (isDupStandard || isDupCustom) { state.customForm.error = 'A category with this name already exists.'; return render(); }
+        const tokens = state.customForm.wordsText.split(/[,;\n]+/).map(t => t.trim()).filter(t => t.length > 0).map(parseWordToken);
+        if (tokens.length < 3) { state.customForm.error = 'Please enter at least 3 valid words.'; return render(); }
+        const wordList = tokens.map(t => t.word);
+        const hintList = tokens.map(t => t.hint);
+        const entry = { id: state.customForm.id || Date.now(), name, words: wordList.length, type: 'custom', wordList, hintList };
+        if (state.customForm.id) {
+            const idx = state.customCategories.findIndex(c => c.id === state.customForm.id);
+            if (idx !== -1) state.customCategories[idx] = entry;
+        } else {
+            state.customCategories.push(entry);
         }
+        saveCategoriesToStorage();
+        state.customForm = { id: null, name: '', wordsText: '', error: '' };
+        setScreen('categories');
+    }
 
-        // --- Custom Category Management ---
+    function openDeleteModal()  { getEl('delete-modal').classList.remove('hidden'); getEl('delete-modal').classList.add('flex'); }
+    function closeDeleteModal() { getEl('delete-modal').classList.add('hidden');    getEl('delete-modal').classList.remove('flex'); }
 
-        function openCreateCustom() {
-            state.customForm = { id: null, name: '', wordsText: '', error: '' };
-            setScreen('createCustom');
+    function confirmDeleteCategory() {
+        if (!state.customForm.id) return;
+        const catName = state.customCategories.find(c => c.id === state.customForm.id)?.name;
+        state.customCategories = state.customCategories.filter(c => c.id !== state.customForm.id);
+        if (catName) state.selectedCategories = state.selectedCategories.filter(n => n !== catName);
+        saveCategoriesToStorage();
+        closeDeleteModal();
+        state.customForm = { id: null, name: '', wordsText: '', error: '' };
+        setScreen('categories');
+    }
+
+    // ─── Game Flow ────────────────────────────────────────────────────────────────
+    function startGame(categoryName) {
+        let wordList, hintList;
+        if (WORD_DATABASE[categoryName]) {
+            wordList = WORD_DATABASE[categoryName];
+            hintList = null;
+        } else {
+            const custom = state.customCategories.find(c => c.name === categoryName);
+            if (!custom || !custom.wordList.length) return;
+            wordList = custom.wordList;
+            hintList = custom.hintList || null;
         }
-
-        function editCustomCategory(id, event) {
-            event.stopPropagation(); // Prevents starting the game
-            const cat = state.customCategories.find(c => c.id === id);
-            if (cat) {
-                state.customForm = {
-                    id: cat.id,
-                    name: cat.name,
-                    wordsText: cat.wordList.join(', '),
-                    error: ''
-                };
-                setScreen('createCustom');
-            }
+        const idx        = Math.floor(Math.random() * wordList.length);
+        const secretWord = wordList[idx];
+        let hint = '';
+        if (hintList) {
+            hint = hintList[idx] || GENERIC_HINTS[Math.floor(Math.random() * GENERIC_HINTS.length)];
+        } else {
+            hint = HINT_DATABASE[secretWord] || GENERIC_HINTS[Math.floor(Math.random() * GENERIC_HINTS.length)];
         }
-
-        function updateCustomForm(field, value) {
-            state.customForm[field] = value;
-            state.customForm.error = '';
+        const rolePool    = shuffle(state.players);
+        const imposterIds = rolePool.slice(0, state.imposterCount).map(p => p.id);
+        let jesterId = null;
+        if (state.settings.jesterRole && state.players.length >= 5) {
+            const nonImposters = rolePool.filter(p => !imposterIds.includes(p.id));
+            if (nonImposters.length > 0) jesterId = nonImposters[0].id;
         }
-
-        function saveCustomCategory() {
-            const name = state.customForm.name.trim();
-            if (!name) { state.customForm.error = 'Category name cannot be empty.'; return render(); }
-            
-            // Check for duplicate names, ignoring the currently edited one
-            const isDupStandard = INITIAL_CATEGORIES.some(c => c.name.toLowerCase() === name.toLowerCase());
-            const isDupCustom = state.customCategories.some(c => c.name.toLowerCase() === name.toLowerCase() && c.id !== state.customForm.id);
-            
-            if (isDupStandard || isDupCustom) {
-                state.customForm.error = 'A category with this name already exists.'; return render();
-            }
-            
-            const words = state.customForm.wordsText.split(/[,;\n]+/).map(w => w.trim()).filter(w => w.length > 0);
-            if (words.length < 3) { state.customForm.error = 'Please enter at least 3 valid words separated by commas.'; return render(); }
-
-            if (state.customForm.id) {
-                // Update existing
-                const index = state.customCategories.findIndex(c => c.id === state.customForm.id);
-                if (index !== -1) {
-                    state.customCategories[index] = { 
-                        id: state.customForm.id, 
-                        name, 
-                        words: words.length, 
-                        type: 'custom', 
-                        wordList: words 
-                    };
-                }
-            } else {
-                // Create new
-                state.customCategories.push({ 
-                    id: Date.now(), 
-                    name, 
-                    words: words.length, 
-                    type: 'custom', 
-                    wordList: words 
-                });
-            }
-
-            saveCategoriesToStorage();
-            state.customForm = { id: null, name: '', wordsText: '', error: '' };
-            setScreen('categories');
-        }
-
-        function openDeleteModal() {
-            getEl('delete-modal').classList.remove('hidden');
-            getEl('delete-modal').classList.add('flex');
-        }
-
-        function closeDeleteModal() {
-            getEl('delete-modal').classList.add('hidden');
-            getEl('delete-modal').classList.remove('flex');
-        }
-
-        function confirmDeleteCategory() {
-            if (state.customForm.id) {
-                state.customCategories = state.customCategories.filter(c => c.id !== state.customForm.id);
-                saveCategoriesToStorage();
-                
-                closeDeleteModal();
-                state.customForm = { id: null, name: '', wordsText: '', error: '' };
-                setScreen('categories');
-            }
-        }
-
-        // --- Game Flow ---
-        function startGame(categoryName) {
-            let words = WORD_DATABASE[categoryName];
-            if (!words) {
-                const custom = state.customCategories.find(c => c.name === categoryName);
-                if (custom) words = custom.wordList;
-            }
-            if (!words || words.length === 0) return;
-
-            const randomWord = words[Math.floor(Math.random() * words.length)];
-            
-            const shuffledForRoles = shuffle(state.players);
-            const imposterIds = shuffledForRoles.slice(0, state.imposterCount).map(p => p.id);
-            
-            let jesterId = null;
-            if (state.settings.jesterRole && state.players.length >= 5) {
-                jesterId = shuffledForRoles[state.imposterCount].id; 
-            }
-
-            let activeWildcard = null;
-            if (state.settings.wildcardRounds) {
-                activeWildcard = WILDCARDS[Math.floor(Math.random() * WILDCARDS.length)];
-            }
-
-            const shuffledTurnOrder = shuffle(state.players);
-
-            state.game = {
-                category: categoryName,
-                secretWord: randomWord,
-                imposterIds: imposterIds,
-                jesterId: jesterId,
-                activeWildcard: activeWildcard,
-                currentPlayerIndex: 0,
-                roleRevealed: false,
-                winner: null,
-                shuffledPlayers: shuffledTurnOrder,
-                activeTurnIndex: 0,
-                timeLeft: state.settings.timeLimit,
-                currentPunishment: '',
-                punishedPlayer: null,
-                lastVotedId: null,
-                earnings: {}
-            };
-            setScreen('reveal');
-        }
-
-        function revealRole() {
-            state.game.roleRevealed = true;
-            render();
-        }
-
-        function nextReveal() {
-            if (state.game.currentPlayerIndex < state.players.length - 1) {
-                state.game.currentPlayerIndex++;
-                state.game.roleRevealed = false;
-                render();
-            } else {
-                setScreen('playing');
-            }
-        }
-
-        function advanceTurn() {
-            state.game.activeTurnIndex++;
-            state.game.timeLeft = state.settings.timeLimit;
-            render();
-        }
-
-        function openVoteModal(playerId) {
-            state.pendingVoteId = playerId;
-            const player = state.players.find(p => p.id === playerId);
-            getEl('vote-target-name').innerText = player ? player.name : 'Player';
-            
-            const btn = getEl('confirm-vote-btn');
-            btn.onclick = () => confirmVote();
-            
-            getEl('vote-modal').classList.remove('hidden');
-            getEl('vote-modal').classList.add('flex');
-        }
-
-        function closeVoteModal() {
-            getEl('vote-modal').classList.add('hidden');
-            getEl('vote-modal').classList.remove('flex');
-        }
-
-        function confirmVote() {
-            const suspectId = state.pendingVoteId;
-            closeVoteModal();
-            state.pendingVoteId = null; 
-            
-            state.game.lastVotedId = suspectId;
-            state.game.earnings = {};
-            
-            if (state.game.jesterId === suspectId) {
-                // Jester Wins
-                state.game.winner = 'jester';
-                state.players.forEach(p => {
-                    if (p.id === suspectId) {
-                        p.score += 2; 
-                        state.game.earnings[p.id] = 2;
-                    } else {
-                        state.game.earnings[p.id] = 0;
-                    }
-                });
-            } else if (state.game.imposterIds.includes(suspectId)) {
-                // Players Win (Caught an imposter)
-                state.game.winner = 'players';
-                state.players.forEach(p => {
-                    if (state.game.imposterIds.includes(p.id)) {
-                        p.score -= 1; // ALL Imposters lose 1 point if the team is caught
-                        state.game.earnings[p.id] = -1;
-                    } else if (p.id !== state.game.jesterId) {
-                        p.score += 1; // Crewmates gain 1 point
-                        state.game.earnings[p.id] = 1;
-                    } else {
-                        state.game.earnings[p.id] = 0; // Jester gets 0
-                    }
-                });
-            } else {
-                // Imposter Wins (Innocent player voted out)
-                state.game.winner = 'imposter';
-                state.players.forEach(p => {
-                    if (state.game.imposterIds.includes(p.id)) {
-                        p.score += 2; // Imposters rewarded
-                        state.game.earnings[p.id] = 2;
-                    } else if (p.id === suspectId) {
-                        p.score -= 1; // Executed innocent loses 1
-                        state.game.earnings[p.id] = -1;
-                    } else {
-                        state.game.earnings[p.id] = 0; // Other innocent players get 0
-                    }
-                });
-            }
-
-            if (state.settings.punishments) {
-                state.game.currentPunishment = PUNISHMENTS[Math.floor(Math.random() * PUNISHMENTS.length)];
-                
-                let loserPool = [];
-                if (state.game.winner === 'jester') {
-                    // Jester won. Punish an innocent.
-                    loserPool = state.players.filter(p => p.id !== state.game.jesterId && !state.game.imposterIds.includes(p.id));
-                } else if (state.game.winner === 'players') {
-                    // Players won. Punish an imposter.
-                    loserPool = state.players.filter(p => state.game.imposterIds.includes(p.id));
-                } else {
-                    // Imposter won. Punish an innocent.
-                    loserPool = state.players.filter(p => !state.game.imposterIds.includes(p.id) && p.id !== state.game.jesterId);
-                }
-                
-                if (loserPool.length === 0) loserPool = state.players; 
-                
-                const punished = loserPool[Math.floor(Math.random() * loserPool.length)];
-                state.game.punishedPlayer = punished.name.trim() || 'Someone';
-            }
-
-            setScreen('result');
-        }
-
-        function showSeriesWinner() {
-            const champion = state.players.find(p => p.score >= state.settings.scoreLimit);
-            if (champion) {
-                getEl('champion-name').innerText = champion.name;
-                getEl('winner-modal').classList.remove('hidden');
-                getEl('winner-modal').classList.add('flex');
-                confettiEffect();
-            }
-        }
-
-        function playNextRound() {
-            setScreen('categories');
-        }
-
-        function resetSeries() {
-            getEl('winner-modal').classList.add('hidden');
-            getEl('winner-modal').classList.remove('flex');
-            state.players.forEach(p => p.score = 0);
-            setScreen('setup');
-        }
-
-        // --- Timer Logic ---
-        function manageTimer() {
-            if (timerInterval) clearInterval(timerInterval);
-            
-            if (state.screen === 'playing' && state.settings.timeLimit > 0) {
-                const totalTurns = state.game.shuffledPlayers.length * state.settings.clueRounds;
-                if (state.game.activeTurnIndex < totalTurns && state.game.timeLeft > 0) {
-                    timerInterval = setInterval(() => {
-                        state.game.timeLeft--;
-                        updateTimerUI();
-                        if (state.game.timeLeft <= 0) {
-                            clearInterval(timerInterval);
-                        }
-                    }, 1000);
-                }
-            }
-        }
-
-        function updateTimerUI() {
-            const textEl = getEl('turn-timer-text');
-            const circleEl = getEl('turn-timer-circle');
-            const dashboardEl = getEl('playing-dashboard');
-            
-            if (textEl && circleEl && dashboardEl) {
-                textEl.innerText = state.game.timeLeft;
-                
-                const timerWarning = state.game.timeLeft <= 3 && state.game.timeLeft > 0;
-                const timerFailed = state.game.timeLeft === 0;
-
-                circleEl.className = `w-24 h-24 rounded-full border-4 flex items-center justify-center shadow-inner transition-colors duration-300 ${
-                    timerWarning ? 'border-amber-500/50 text-amber-400 bg-amber-500/10 animate-pulse-fast' : 
-                    timerFailed ? 'border-red-500/50 text-red-500 bg-red-500/10' : 
-                    'border-blue-500/30 text-blue-300 bg-black/20'
-                }`;
-
-                dashboardEl.className = `glass-card rounded-[2rem] p-6 sm:p-8 text-center border relative overflow-hidden flex-1 flex flex-col justify-center shadow-xl transition-colors duration-300 ${
-                    timerWarning ? 'border-amber-500/50 bg-amber-950/30' : 
-                    timerFailed ? 'border-red-500/50 bg-red-950/40' : 
-                    'border-blue-500/30'
-                }`;
-
-                if (timerFailed) render(); // Re-render once to show "TIME'S UP" text
-            }
-        }
-
-        function confettiEffect() {
-            const modal = getEl('winner-modal');
-            for (let i = 0; i < 50; i++) {
-                const conf = document.createElement('div');
-                conf.style.position = 'absolute';
-                conf.style.width = '10px';
-                conf.style.height = '10px';
-                conf.style.backgroundColor = ['#f59e0b', '#3b82f6', '#ef4444', '#10b981', '#a855f7', '#d946ef'][Math.floor(Math.random()*6)];
-                conf.style.left = '50%';
-                conf.style.top = '50%';
-                conf.style.transform = `translate(-50%, -50%) rotate(${Math.random()*360}deg)`;
-                conf.style.transition = 'all 1s cubic-bezier(0.1, 0.8, 0.3, 1)';
-                conf.style.opacity = '1';
-                conf.style.zIndex = '40';
-                modal.appendChild(conf);
-
-                setTimeout(() => {
-                    const angle = Math.random() * Math.PI * 2;
-                    const velocity = 100 + Math.random() * 200;
-                    conf.style.transform = `translate(calc(-50% + ${Math.cos(angle)*velocity}px), calc(-50% + ${Math.sin(angle)*velocity}px)) rotate(${Math.random()*720}deg)`;
-                    conf.style.opacity = '0';
-                }, 50);
-
-                setTimeout(() => conf.remove(), 1050);
-            }
-        }
-
-        // --- Init ---
-        window.onload = () => {
-            loadCategoriesFromStorage();
-            render();
+        const activeWildcard = state.settings.wildcardRounds ? WILDCARDS[Math.floor(Math.random() * WILDCARDS.length)] : null;
+        state.game = {
+            category: categoryName, secretWord, hint,
+            imposterIds, jesterId, activeWildcard,
+            currentPlayerIndex: 0, roleRevealed: false, winner: null,
+            shuffledPlayers: shuffle(state.players),
+            activeTurnIndex: 0, timeLeft: state.settings.timeLimit,
+            currentPunishment: '', punishedPlayer: null,
+            lastVotedId: null, earnings: {}
         };
+        setScreen('reveal');
+    }
+
+    function revealRole()  { state.game.roleRevealed = true; render(); }
+
+    function nextReveal() {
+        if (state.game.currentPlayerIndex < state.players.length - 1) {
+            state.game.currentPlayerIndex++;
+            state.game.roleRevealed = false;
+            render();
+        } else {
+            setScreen('playing');
+        }
+    }
+
+    function advanceTurn() {
+        state.game.activeTurnIndex++;
+        state.game.timeLeft = state.settings.timeLimit;
+        render();
+    }
+
+    // ─── Voting ───────────────────────────────────────────────────────────────────
+    function openVoteModal(playerId) {
+        state.pendingVoteId = playerId;
+        const p = state.players.find(p => p.id === playerId);
+        getEl('vote-target-name').innerText = p ? p.name : 'Player';
+        getEl('confirm-vote-btn').onclick = confirmVote;
+        getEl('vote-modal').classList.remove('hidden');
+        getEl('vote-modal').classList.add('flex');
+    }
+    function closeVoteModal() {
+        getEl('vote-modal').classList.add('hidden');
+        getEl('vote-modal').classList.remove('flex');
+    }
+
+    function confirmVote() {
+        const suspectId = state.pendingVoteId;
+        closeVoteModal();
+        state.pendingVoteId = null;
+        state.game.lastVotedId = suspectId;
+        state.game.earnings = {};
+        if (state.game.jesterId === suspectId) {
+            state.game.winner = 'jester';
+            state.players.forEach(p => {
+                const pts = p.id === suspectId ? 2 : 0;
+                p.score += pts; state.game.earnings[p.id] = pts;
+            });
+        } else if (state.game.imposterIds.includes(suspectId)) {
+            state.game.winner = 'players';
+            state.players.forEach(p => {
+                let pts = 0;
+                if (state.game.imposterIds.includes(p.id))  pts = -1;
+                else if (p.id !== state.game.jesterId)       pts = 1;
+                p.score += pts; state.game.earnings[p.id] = pts;
+            });
+        } else {
+            state.game.winner = 'imposter';
+            state.players.forEach(p => {
+                let pts = 0;
+                if (state.game.imposterIds.includes(p.id)) pts = 2;
+                else if (p.id === suspectId)                pts = -1;
+                p.score += pts; state.game.earnings[p.id] = pts;
+            });
+        }
+        if (state.settings.punishments) {
+            let loserPool = [];
+            if      (state.game.winner === 'jester')  loserPool = state.players.filter(p => p.id !== state.game.jesterId && !state.game.imposterIds.includes(p.id));
+            else if (state.game.winner === 'players') loserPool = state.players.filter(p => state.game.imposterIds.includes(p.id));
+            else                                      loserPool = state.players.filter(p => !state.game.imposterIds.includes(p.id) && p.id !== state.game.jesterId);
+            if (!loserPool.length) loserPool = state.players;
+            const punished = loserPool[Math.floor(Math.random() * loserPool.length)];
+            state.game.currentPunishment = PUNISHMENTS[Math.floor(Math.random() * PUNISHMENTS.length)];
+            state.game.punishedPlayer    = punished.name.trim() || 'Someone';
+        }
+        setScreen('result');
+    }
+
+    // ─── Series ───────────────────────────────────────────────────────────────────
+    function showSeriesWinner() {
+        const champion = state.players.find(p => p.score >= state.settings.scoreLimit);
+        if (!champion) return;
+        getEl('champion-name').innerText = champion.name;
+        getEl('winner-modal').classList.remove('hidden');
+        getEl('winner-modal').classList.add('flex');
+        confettiEffect();
+    }
+    function playNextRound() { setScreen('categories'); }
+    function resetSeries() {
+        getEl('winner-modal').classList.add('hidden');
+        getEl('winner-modal').classList.remove('flex');
+        state.players.forEach(p => p.score = 0);
+        setScreen('setup');
+    }
+
+    // ─── Timer ────────────────────────────────────────────────────────────────────
+    function manageTimer() {
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        if (state.screen !== 'playing' || state.settings.timeLimit <= 0) return;
+        const totalTurns = state.game.shuffledPlayers.length * state.settings.clueRounds;
+        if (state.game.activeTurnIndex >= totalTurns || state.game.timeLeft <= 0) return;
+        timerInterval = setInterval(() => {
+            if (state.game.timeLeft > 0) { state.game.timeLeft--; updateTimerUI(); }
+            if (state.game.timeLeft <= 0) { clearInterval(timerInterval); timerInterval = null; render(); }
+        }, 1000);
+    }
+
+    function updateTimerUI() {
+        const textEl      = getEl('turn-timer-text');
+        const circleEl    = getEl('turn-timer-circle');
+        const dashboardEl = getEl('playing-dashboard');
+        if (!textEl || !circleEl || !dashboardEl) return;
+        const { timeLeft } = state.game;
+        const warning = timeLeft <= 3 && timeLeft > 0;
+        const failed  = timeLeft === 0;
+        textEl.innerText = timeLeft;
+        circleEl.className = `w-24 h-24 rounded-full border-4 flex items-center justify-center shadow-inner transition-colors duration-300 ${warning ? 'border-amber-500/50 text-amber-400 bg-amber-500/10 animate-pulse-fast' : failed ? 'border-red-500/50 text-red-500 bg-red-500/10' : 'border-blue-500/30 text-blue-300 bg-black/20'}`;
+        dashboardEl.className = `glass-card rounded-[2rem] p-6 sm:p-8 text-center border relative overflow-hidden flex-1 flex flex-col justify-center shadow-xl transition-colors duration-300 ${warning ? 'border-amber-500/50 bg-amber-950/30' : failed ? 'border-red-500/50 bg-red-950/40' : 'border-blue-500/30'}`;
+    }
+
+    // ─── Confetti ─────────────────────────────────────────────────────────────────
+    function confettiEffect() {
+        const modal  = getEl('winner-modal');
+        const colors = ['#f59e0b','#3b82f6','#ef4444','#10b981','#a855f7','#d946ef'];
+        for (let i = 0; i < 50; i++) {
+            const el = document.createElement('div');
+            Object.assign(el.style, { position:'absolute', width:'10px', height:'10px', backgroundColor: colors[Math.floor(Math.random()*colors.length)], left:'50%', top:'50%', opacity:'1', zIndex:'40', transform:'translate(-50%,-50%)', transition:'all 1s cubic-bezier(0.1,0.8,0.3,1)' });
+            modal.appendChild(el);
+            setTimeout(() => {
+                const a = Math.random() * Math.PI * 2;
+                const v = 100 + Math.random() * 200;
+                el.style.transform = `translate(calc(-50% + ${Math.cos(a)*v}px), calc(-50% + ${Math.sin(a)*v}px)) rotate(${Math.random()*720}deg)`;
+                el.style.opacity = '0';
+            }, 50);
+            setTimeout(() => el.remove(), 1050);
+        }
+    }
+
+    // ─── Init ─────────────────────────────────────────────────────────────────────
+    window.onload = () => { loadCategoriesFromStorage(); render(); };
     </script>
 </body>
 </html>
+
 
 
 
